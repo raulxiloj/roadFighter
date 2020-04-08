@@ -1,16 +1,37 @@
 include macros.asm
 include graphics.asm
+include files.asm
 
 .model small
 ;-----Stack segment-----
 .stack 100h
 ;-----Data segment-----
 .data
-header1    db 9,9,9,"======================",10,9,9,9,"     Road fighter     ",10,9,9,9,"======================",10,'$' 
-header2    db "UNIVERSIDAD DE SAN CARLOS DE GUATEMALA",10,"FACULTAD DE INGENIERIA",10,"CIENCIAS Y SISTEMAS",10,"ARQUITECTURA DE COMPUTADORAS Y ENSAMBLADORES 1",10,"NOMBRE: RAUL XILOJ",10,"CARNET: 201612113",10,"SECCION: A",10,'$'
-mainMenu   db 10,9,9,9,"     1. Ingresar",10,9,9,9,"     2. Registrar",10,9,9,9,"     3. Salir",10,10,9,9,9,"Ingrese una opcion: ",'$'
+header1     db 9,9,9,"======================",10,9,9,9,"     Road fighter     ",10,9,9,9,"======================",10,'$' 
+header2     db "UNIVERSIDAD DE SAN CARLOS DE GUATEMALA",10,"FACULTAD DE INGENIERIA",10,"CIENCIAS Y SISTEMAS",10,"ARQUITECTURA DE COMPUTADORAS Y ENSAMBLADORES 1",10,"NOMBRE: RAUL XILOJ",10,"CARNET: 201612113",10,"SECCION: A",10,'$'
+mainMenu    db 10,9,9,9,"     1. Ingresar",10,9,9,9,"     2. Registrar",10,9,9,9,"     3. Salir",10,10,9,9,9,"Ingrese una opcion: ",'$'
+userMenu    db 10,9,9,9,"     1. Iniciar juego",10,9,9,9,"     2. Cargar juego",10,9,9,9,"     3. Logout",10,10,9,9,9,"Ingrese una opcion: ",'$'
+comma       db ","
+newLine     db 10,'$'
+;---------------------------------Register-----------------------------------
+msgRegister db 10,"Registro",10,"========",10,10,'$'
+inputName   db "Username: ",'$'
+userName    db 15 dup ('$')
+inputPass   db "Password: "
+userPass    db 10 dup ('$')
+;------------------------File messages and variables-------------------------
+userFile    db "c:\pro\users.txt",0
+usersData   db 1000 dup('$')
+handler     dw ?
+userSaved   db 10,"Usuario registrado correctamente ",'$'
 ;----------------------------Possibles errors--------------------------------
-error1       db 10,13,"Error: Opcion invalida",10,13,'$'
+error1      db 10,13,"ERROR: Opcion invalida",10,13,'$'
+error2      db 10,13,"ERROR al abrir archivo",10,13,'$'
+error3      db 10,13,"ERROR al escribir en el archivo",10,13,'$'
+error4      db 10,13,"ERROR al cerrar el archivo",10,13,'$'
+error5      db 10,13,"ERROR: moviendo el puntero del fichero",10,13,'$'
+error6      db "ERROR: el nombre de usuario no puede exceder los 7 caracteres", 10,'$'
+error7      db "ERROR: la contrasena tiene que ser 4 digitos",10,'$'
 ;---------------------------------------------------------------------------------------------
 ;-----------------------------------------Code segment-----------------------------------------
 ;----------------------------------------------------------------------------------------------
@@ -31,12 +52,33 @@ main proc
         je exit
         jmp invalidChar
     login:
-
+        ;Todo 
         jmp menuPrincipal
     register:
-
+        clearScreen
+        registerUser
         jmp menuPrincipal
     invalidChar:
+
+        jmp menuPrincipal
+    errorOpening:
+        print error2
+        getChar
+        jmp menuPrincipal
+    errorReading:
+        getChar
+        jmp menuPrincipal
+    errorWriting:
+        print error3
+        getChar
+        jmp menuPrincipal
+    errorClosing:
+        print error4
+        getChar
+        jmp menuPrincipal
+    errorAppending:
+        print error5
+        getChar
         jmp menuPrincipal
     exit:
         mov ah, 4ch
