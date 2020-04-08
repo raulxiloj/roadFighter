@@ -18,3 +18,12 @@ getChar macro
     mov ah, 01h
     int 21h
 endm
+
+clearScreen macro
+    setGraphicMode
+    setTextMode
+endm
+
+registerUser macro
+
+endm
