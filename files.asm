@@ -72,7 +72,15 @@ seekEnd macro handler
     jc errorAppending
 endm
 
-;Save user
+;-----------------------------------------------------------------------------------------
+;                       Special macros releated with files
+;-----------------------------------------------------------------------------------------
+getUsersData macro
+    openFile userFile, handler
+    readFile handler, usersData, 1000 
+    closeFile handler
+endm
+
 saveUser macro user, pass
     openFile userFile, handler
     getLength user  ;possible change to the check length username
