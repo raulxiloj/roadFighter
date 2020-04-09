@@ -24,6 +24,7 @@ readFile macro handler,fileData,numBytes
     mov cx, numBytes
     lea dx, fileData
     int 21h
+    mov fileSize, ax
     jc errorReading
 endm
 
