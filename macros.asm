@@ -66,6 +66,7 @@ endm
 clearScreen macro
     setGraphicMode
     setTextMode
+    printChar 10
 endm
 
 ;------------------------------------------------------------------------------------
@@ -136,13 +137,8 @@ endm
 
 ;return dx
 nameAlreadyUsed macro
-LOCAL while, changeState, continue, checkName, match, notMatch, finish
-    
-    ;get Data
-    openFile userFile, handler
-    readFile handler, usersData, 1000 
-    closeFile handler
-
+LOCAL while, changeState, continue, checkName , finish
+    getUsersData
     xor si, si
     xor ax, ax 
     xor bx, bx
@@ -173,7 +169,7 @@ LOCAL while, changeState, continue, checkName, match, notMatch, finish
             jmp while  
         
     checkName:
-        compareStrings userName, auxUser
+        compareStrings userName, auxUser, 7
         pusha
         cleanBuffer auxUser, SIZEOF auxUser, 24h
         popa
@@ -186,14 +182,14 @@ LOCAL while, changeState, continue, checkName, match, notMatch, finish
         cleanBuffer auxUser, SIZEOF auxUser, 24h
 endm
 
-;return dx
-compareStrings macro str1, str2
+;return dx (0 = not equal, 1 = equal)
+compareStrings macro str1, str2, length
 LOCAL while, finish, continue, notEqual, equal
     xor di, di
     xor bx, bx
     xor dx, dx
     while:
-        cmp di, 7
+        cmp di, length
         je equal
 
         mov bh, str1[di]
@@ -214,4 +210,99 @@ LOCAL while, finish, continue, notEqual, equal
         mov dx, 1
 
     finish:
+endm
+
+;---------------------------------------------------------------------------------
+loginAccess macro
+LOCAL isAdmin, isUser, error
+    print msgLogin
+    print inputName
+    getString userName
+    print inputPass
+    getString userPass
+    
+    isAdmin:
+        compareStrings userName, adminName, 5
+        cmp dx, 0
+        je isUser
+        compareStrings userPass, adminPass, 4
+        cmp dx, 0
+        je error
+        adminSession
+
+    isUser:
+        checkIfIsUser
+        cmp dx, 0
+        je error
+        userSession
+
+    error:
+        cleanBuffer userName, SIZEOF username, 24h
+        cleanBuffer userPass, SIZEOF userPass, 24h
+        print error9
+        getChar
+        jmp menuPrincipal
+
+endm
+
+checkIfIsUser macro
+LOCAL while, checkUser, changeState, state1, state2, continue, finish
+    getUsersData
+    xor si, si
+    xor ax, ax 
+    xor bx, bx
+    xor cx, cx  ;flag for state. 0 = user | 1 = password
+
+    ;Split data
+    while:
+        cmp si, fileSize
+        je finish
+        xor ah, ah
+        mov al, usersData[si]
+        cmp al, 10
+        je checkUser 
+        cmp al, ','
+        je changeState
+        cmp cx, 1
+        je state2
+
+        state1:
+            mov auxUser[bx], al    
+            inc bx
+            jmp continue
+
+        state2:
+            mov auxPass[bx], al    
+            inc bx
+            jmp continue
+
+        changeState:
+            mov cx, 1
+            xor bx, bx
+
+        continue:
+            inc si
+            jmp while  
+        
+    checkUser:
+    ;check username
+    compareStrings userName, auxUser, 7
+    pusha
+    cleanBuffer auxUser, SIZEOF auxUser, 24h
+    popa
+    xor bx, bx      ;restart aux
+    xor cx, cx      ;restart flag
+    cmp dx, 0
+    je continue
+    ;check password
+    compareStrings userPass, auxPass, 4
+    pusha
+    cleanBuffer auxPass, SIZEOF auxPass, 24h
+    popa
+    cmp dx, 1 
+    je finish
+    jmp continue
+
+    finish:
+    
 endm

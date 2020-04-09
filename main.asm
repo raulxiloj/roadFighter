@@ -1,6 +1,8 @@
 include macros.asm
 include graphics.asm
 include files.asm
+include admin.asm
+include normalU.asm
 
 .model small
 ;-----Stack segment-----
@@ -10,17 +12,21 @@ include files.asm
 header1     db 9,9,9,"======================",10,9,9,9,"     Road fighter     ",10,9,9,9,"======================",10,'$' 
 header2     db "UNIVERSIDAD DE SAN CARLOS DE GUATEMALA",10,"FACULTAD DE INGENIERIA",10,"CIENCIAS Y SISTEMAS",10,"ARQUITECTURA DE COMPUTADORAS Y ENSAMBLADORES 1",10,"NOMBRE: RAUL XILOJ",10,"CARNET: 201612113",10,"SECCION: A",10,'$'
 mainMenu    db 10,9,9,9,"     1. Ingresar",10,9,9,9,"     2. Registrar",10,9,9,9,"     3. Salir",10,10,9,9,9,"Ingrese una opcion: ",'$'
-userMenu    db 10,9,9,9,"     1. Iniciar juego",10,9,9,9,"     2. Cargar juego",10,9,9,9,"     3. Logout",10,10,9,9,9,"Ingrese una opcion: ",'$'
+userMenu    db 10,"1. Iniciar juego",10,"2. Cargar juego",10,"3. Logout",10,10,"Ingrese una opcion: ",'$'
+adminMenu   db 10,"1. Top 10 puntos",10,"2. Top 10 tiempo",10,"3. Logout",10,10,"Ingrese una opcion: ",'$'
 comma       db ","
 newLine     db 10,'$'
-;---------------------------------Register-----------------------------------
-msgRegister db 10,"Registro",10,"========",10,10,'$'
+;------------------------Login & Register variables--------------------------
+msgRegister db "Registro",10,"========",10,10,'$'
+msgLogin    db "Ingresar",10,"========",10,10,'$'
 inputName   db "Username: ",'$'
 userName    db 15 dup ('$')
 inputPass   db "Password: "
 userPass    db 10 dup ('$')
 auxUser     db 15 dup ('$')
 auxPass     db 4 dup ('$')
+adminName   db "admin"
+adminPass   db "1234"
 ;------------------------File messages and variables-------------------------
 userFile    db "c:\pro\users.txt",0
 usersData   db 1000 dup('$')
@@ -36,6 +42,7 @@ error5      db 10,13,"ERROR: moviendo el puntero del fichero",10,13,'$'
 error6      db "ERROR: el nombre de usuario no puede exceder los 7 caracteres", 10,'$'
 error7      db "ERROR: la contrasena tiene que ser 4 digitos",10,'$'
 error8      db "ERROR: ese nombre ya esta registrado, por favor ingrese otro",10,'$'
+error9      db "ERROR: credenciales incorrectas",10,'$'
 ;---------------------------------------------------------------------------------------------
 ;-----------------------------------------Code segment-----------------------------------------
 ;----------------------------------------------------------------------------------------------
@@ -56,7 +63,8 @@ main proc
         je exit
         jmp invalidChar
     login:
-        ;Todo
+        clearScreen
+        loginAccess
         jmp menuPrincipal
     register:
         clearScreen
