@@ -19,9 +19,12 @@ inputName   db "Username: ",'$'
 userName    db 15 dup ('$')
 inputPass   db "Password: "
 userPass    db 10 dup ('$')
+auxUser     db 15 dup ('$')
+auxPass     db 4 dup ('$')
 ;------------------------File messages and variables-------------------------
 userFile    db "c:\pro\users.txt",0
 usersData   db 1000 dup('$')
+fileSize    dw 0
 handler     dw ?
 userSaved   db 10,"Usuario registrado correctamente ",'$'
 ;----------------------------Possibles errors--------------------------------
@@ -32,6 +35,7 @@ error4      db 10,13,"ERROR al cerrar el archivo",10,13,'$'
 error5      db 10,13,"ERROR: moviendo el puntero del fichero",10,13,'$'
 error6      db "ERROR: el nombre de usuario no puede exceder los 7 caracteres", 10,'$'
 error7      db "ERROR: la contrasena tiene que ser 4 digitos",10,'$'
+error8      db "ERROR: ese nombre ya esta registrado, por favor ingrese otro",10,'$'
 ;---------------------------------------------------------------------------------------------
 ;-----------------------------------------Code segment-----------------------------------------
 ;----------------------------------------------------------------------------------------------
@@ -52,7 +56,7 @@ main proc
         je exit
         jmp invalidChar
     login:
-        ;Todo 
+        ;Todo
         jmp menuPrincipal
     register:
         clearScreen

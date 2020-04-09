@@ -70,7 +70,7 @@ endm
 
 ;------------------------------------------------------------------------------------
 registerUser macro
-LOCAL checkUserLength, continue, errorLength1, errorLength2, finish, checkPassLength
+LOCAL checkUserLength, continue, errorLength1, errorLength2, finish, checkPassLength, checkNameUsed
     print msgRegister
     checkUserLength:
         print inputName
@@ -79,12 +79,18 @@ LOCAL checkUserLength, continue, errorLength1, errorLength2, finish, checkPassLe
         cmp si, 0
         je checkUserLength
         cmp si, 8
-        jl checkPassLength
+        jl checkNameUsed
     errorLength1:
         print error6
         cleanBuffer userName, SIZEOF userName, 24h
         jmp checkUserLength
-    ;checkUserExist: tag TODOcheck if it already exist
+    checkNameUsed:
+        nameAlreadyUsed
+        cmp dx, 0
+        je checkPassLength
+        print error8
+        cleanBuffer userName, SIZEOF userName, 24h
+        jmp checkUserLength
     checkPassLength:
         print inputPass
         getString userPass
@@ -107,7 +113,6 @@ endm
 
 checkNumericPassword macro
 LOCAL while, continue, error, finish
-    int 3
     xor ax, ax
     xor si, si
     while:
@@ -127,4 +132,86 @@ LOCAL while, continue, error, finish
         cleanBuffer userPass, SIZEOF userPass, 24h
     finish:
     
+endm
+
+;return dx
+nameAlreadyUsed macro
+LOCAL while, changeState, continue, checkName, match, notMatch, finish
+    
+    ;get Data
+    openFile userFile, handler
+    readFile handler, usersData, 1000 
+    closeFile handler
+
+    xor si, si
+    xor ax, ax 
+    xor bx, bx
+    xor cx, cx  ;flag for state. 0 = getUser | 1 = find char of exit '\n'
+
+    ;Split data
+    while:
+        cmp si, fileSize
+        je finish
+        xor ah, ah
+        mov al, usersData[si]
+        cmp al, 10
+        je checkName 
+        cmp al, ','
+        je changeState
+        cmp cx, 1
+        je continue
+
+        mov auxUser[bx], al    
+        inc bx
+        jmp continue
+
+        changeState:
+            mov cx, 1
+
+        continue:
+            inc si
+            jmp while  
+        
+    checkName:
+        compareStrings userName, auxUser
+        pusha
+        cleanBuffer auxUser, SIZEOF auxUser, 24h
+        popa
+        xor bx, bx      ;restart aux
+        xor cx, cx 
+        cmp dx, 1
+        je finish
+        jmp continue
+    finish:
+        cleanBuffer auxUser, SIZEOF auxUser, 24h
+endm
+
+;return dx
+compareStrings macro str1, str2
+LOCAL while, finish, continue, notEqual, equal
+    xor di, di
+    xor bx, bx
+    xor dx, dx
+    while:
+        cmp di, 7
+        je equal
+
+        mov bh, str1[di]
+        mov bl, str2[di]
+        cmp bh, bl
+        je continue
+        jmp notEqual
+
+        continue:
+            inc di
+            jmp while
+    
+    notEqual:
+        mov dx, 0
+        jmp finish
+    
+    equal:
+        mov dx, 1
+
+    finish:
 endm
