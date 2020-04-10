@@ -310,3 +310,37 @@ LOCAL while, checkUser, changeState, state1, state2, continue, finish
     finish:
     
 endm
+
+;-----------------------------ADMIN MODE------------------------------
+adminSession macro
+    clearScreen
+    print header2
+    print adminMenu
+    getChar
+    jmp menuPrincipal
+endm
+
+;---------------------------NORMAL USER-----------------------------------
+userSession macro
+LOCAL menu, startGame, logout
+    menu:
+        clearScreen
+        print header2
+        print userMenu
+        getChar
+        cmp al, '1'
+        je startGame
+        cmp al, '2'
+        je menuPrincipal
+        cmp al, '3'
+        je logout
+        jmp menu
+    startGame:
+        initGame
+        jmp menu    
+    logout:
+        cleanBuffer userName, SIZEOF username, 24h
+        cleanBuffer userPass, SIZEOF userPass, 24h
+        jmp menuPrincipal
+
+endm

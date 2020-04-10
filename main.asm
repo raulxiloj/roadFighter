@@ -1,8 +1,7 @@
 include macros.asm
 include graphics.asm
 include files.asm
-include admin.asm
-include normalU.asm
+include game.asm
 
 .model small
 ;-----Stack segment-----

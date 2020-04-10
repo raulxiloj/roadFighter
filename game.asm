@@ -1,3 +1,12 @@
+initGame macro
+    setVideoMode
+    paintBoard 0fh
+    paintBackground 7
+    drawCar 50072        ;156,152
+    getChar
+    setTextMode
+endm
+
 ;320*i+j
 paintBoard macro color
 LOCAL top, bottom, leftSide, rightSide
