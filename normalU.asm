@@ -15,6 +15,7 @@ LOCAL menu,initGame, logout
     initGame:
         setVideoMode
         paintBoard 0fh
+        paintBackground 08
         getChar
         setTextMode
         jmp menu    
@@ -27,6 +28,7 @@ endm
 
 ;320*i+j
 paintBoard macro color
+LOCAL top, bottom, leftSide, rightSide
 mov dl, color
 mov di, 6410        ;(20,10) 
 top:
@@ -55,4 +57,30 @@ rightSide:
     add di, 320
     cmp di, 61109   ;(190,309)
     jne rightSide
+endm
+
+paintBackground macro color
+LOCAL for1, for2
+    xor ax, ax    ;count rows
+    xor bx, bx    ;next row
+    xor cx, cx    ;aux
+    mov ax, 0
+    mov dl, color
+    mov di, 6731      
+    jmp for1
+    fixRow:
+        add bx, 320
+        mov di, bx   
+    for1:
+        inc ax
+        mov bx, di
+        mov cx, di
+        add cx, 298
+        for2: 
+            mov [di], dl
+            inc di 
+            cmp di, cx
+            jne for2
+            cmp ax, 169
+            jne fixRow
 endm
