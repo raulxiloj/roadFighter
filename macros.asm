@@ -64,8 +64,12 @@ LOCAL repeat
 endm
 
 clearScreen macro
-    setGraphicMode
-    setTextMode
+    ;video mode
+    mov ax, 0013h
+    int 10h
+    ;text mode
+    mov ax, 0003h
+    int 10h
     printChar 10
 endm
 
