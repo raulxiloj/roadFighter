@@ -2,8 +2,9 @@ initGame macro
     setVideoMode
     paintBoard 0fh
     paintBackground 7
-    drawCar 50072        ;156,152
-    getChar
+    mov currPos, 50072
+    drawCar 50072        
+    moveCar
     setTextMode
 endm
 
@@ -144,5 +145,67 @@ LOCAL body, wheels1, wheels2
         mov [di+18], dl
         mov [di+19], dl
         loop wheels2
+endm
+
+eraseCar macro 
+LOCAL while, while2, littleFix
+    xor bx, bx      ;next row
+    xor cx, cx      ;counter, ch for rows and cl for cols
+    mov cx, 0
+    mov dl, 7
+    mov di, currPos
+    jmp while
+    littleFix:
+        add bx, 320
+        mov di, bx
+        mov cl, 0
+    while:
+        inc ch
+        mov bx, di
+        while2:
+            mov [di], dl
+            inc di 
+            inc cl
+            cmp cl, 20
+            jne while2
+            cmp ch, 25
+            jne littleFix    
+
+endm
+
+moveCar macro
+LOCAL while, moveLeft, moveRight, pauseGame, finishGame, finish
+    while:
+        getKey 
+        cmp ah, 4Bh
+        je moveLeft
+        cmp ah, 4Dh      
+        je moveRight
+        cmp al, 27      ;ESC 
+        je pauseGame
+        cmp al, 32      ;Space
+        je finishGame
+        jmp while
+    
+    moveLeft:   
+        eraseCar
+        sub currPos, 5
+        drawCar currPos
+        jmp while
+
+    moveRight:
+        eraseCar
+        add currPos, 5
+        drawCar currPos
+        jmp while
+
+    pauseGame:
+        ;print prueba
+        jmp while
+
+    finishGame:
+        ;save result of game
+
+    finish:
 
 endm

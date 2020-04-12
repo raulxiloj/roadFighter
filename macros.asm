@@ -20,6 +20,11 @@ getChar macro
     int 21h
 endm
 
+getKey macro
+    xor ax, ax  ;ah = 0
+    int 16h
+endm
+
 ;Macro para obtener texto del usuario
 ;param array = variable en donde se almacerana el texto 
 getString macro array

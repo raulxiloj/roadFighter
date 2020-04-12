@@ -15,6 +15,7 @@ userMenu    db 10,"1. Iniciar juego",10,"2. Cargar juego",10,"3. Logout",10,10,"
 adminMenu   db 10,"1. Top 10 puntos",10,"2. Top 10 tiempo",10,"3. Logout",10,10,"Ingrese una opcion: ",'$'
 comma       db ","
 newLine     db 10,'$'
+currPos     dw ? 
 ;------------------------Login & Register variables--------------------------
 msgRegister db "Registro",10,"========",10,10,'$'
 msgLogin    db "Ingresar",10,"========",10,10,'$'
