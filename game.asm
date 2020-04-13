@@ -3,7 +3,9 @@ initGame macro
     paintBoard 0fh
     paintBackground 7
     mov currPos, 50072
-    drawCar 50072        
+    drawCar 50072 
+    drawBlock 19050, 2 ,0Ah 
+    drawBlock 25650, 0Eh , 0Ch
     moveCar
     setTextMode
 endm
@@ -200,11 +202,86 @@ LOCAL while, moveLeft, moveRight, pauseGame, finishGame, finish
         jmp while
 
     pauseGame:
-        ;print prueba
+        ;TODO states of pause
         jmp while
 
     finishGame:
         ;save result of game
+
+    finish:
+
+endm
+
+;Colors
+;Good block: 0Eh, 0Ch
+;Bad block: 2 ,0Ah  
+drawBlock macro pos, color1, color2  
+LOCAL while, L1, L2, L3, secondAux, finish
+    xor cx, cx
+    mov di, pos
+    mov dl, color1
+
+    while:
+        cmp cx, 4
+        jl L1
+        cmp cx, 8
+        jl L2
+        cmp cx, 12 
+        jl L3
+        cmp cx, 16
+        jl L2
+        cmp cx, 20
+        jl L1
+        jmp finish
+
+    L1:
+        inc cx
+        mov [di+8], dl
+        mov [di+9], dl
+        mov [di+10], dl
+        mov [di+11], dl
+        add di, 320
+        jmp while
+    L2:
+        inc cx
+        mov [di+4], dl
+        mov [di+5], dl
+        mov [di+6], dl
+        mov [di+7], dl
+        mov dl, color2
+        mov [di+8], dl
+        mov [di+9], dl
+        mov [di+10], dl
+        mov [di+11], dl
+        mov dl, color1
+        mov [di+12], dl
+        mov [di+13], dl
+        mov [di+14], dl
+        mov [di+15], dl
+        add di, 320
+        jmp while
+    L3:  
+        inc cx
+        mov [di], dl
+        mov [di+1], dl
+        mov [di+2], dl
+        mov [di+3], dl
+        mov dl, color2
+        mov bx, 4
+        push cx
+        mov cx, 12
+        secondAux:
+            mov [di + bx],dl
+            inc bl
+            loop secondAux
+        pop cx
+        mov dl, color1
+        mov [di+16], dl
+        mov [di+17], dl
+        mov [di+18], dl
+        mov [di+19], dl
+        add di, 320
+        jmp while
 
     finish:
 
