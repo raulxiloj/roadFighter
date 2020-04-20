@@ -25,6 +25,11 @@ getKey macro
     int 16h
 endm
 
+checkPress macro
+    mov ah, 0Bh
+    int 21h
+endm
+
 ;Macro para obtener texto del usuario
 ;param array = variable en donde se almacerana el texto 
 getString macro array
@@ -76,6 +81,28 @@ clearScreen macro
     mov ax, 0003h
     int 10h
     printChar 10
+endm
+
+;-------------------DELAY-----------------------
+Delay macro constante
+LOCAL D1,D2,Fin
+    push si
+    push di
+    mov si,constante
+
+    D1:
+        dec si
+        jz Fin
+        mov di,constante
+
+    D2:
+        dec di
+        jnz D2
+        jmp D1
+
+    Fin:
+        pop di
+        pop si
 endm
 
 ;------------------------------------------------------------------------------------

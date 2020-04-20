@@ -15,7 +15,17 @@ userMenu    db 10,"1. Iniciar juego",10,"2. Cargar juego",10,"3. Logout",10,10,"
 adminMenu   db 10,"1. Top 10 puntos",10,"2. Top 10 tiempo",10,"3. Logout",10,10,"Ingrese una opcion: ",'$'
 comma       db ","
 newLine     db 10,'$'
-currPos     dw ? 
+;------------------------------Game var's---------------------------------------
+currPos     dw ?                ;Actual position of  the car              
+points      dw ?                ;var for managing points
+pointsAux   db "000",'$'         
+awards      db 30 dup ('$')     ;array of awards blocks
+obstacles   db 30 dup ('$')     ;array of obstacles blocks
+blocks      db 99 dup (0)
+auxBlock    db 3 dup (0)
+;-------Time game-------
+seconds     dw ?
+time        db "00:00:00",'$'
 ;------------------------Login & Register variables--------------------------
 msgRegister db "Registro",10,"========",10,10,'$'
 msgLogin    db "Ingresar",10,"========",10,10,'$'
