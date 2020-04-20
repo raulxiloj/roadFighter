@@ -302,13 +302,14 @@ endm
 ;-----------------------------------------------------------------------------
 drawString macro row, col, string 
 LOCAL while
-    int 3
     xor bx, bx
     xor cx, cx
     mov cl, col
     getLength string 
     while:
-        drawChar cl, row, string[bx]
+        push bx
+        drawChar row, cl, string[bx]
+        pop bx
         inc cl
         inc bx
         dec si
