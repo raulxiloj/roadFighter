@@ -24,8 +24,11 @@ obstacles   db 30 dup ('$')     ;array of obstacles blocks
 blocks      db 99 dup (0)
 auxBlock    db 3 dup (0)
 ;-------Time game-------
-seconds     dw ?
-time        db "00:00:00",'$'
+minutes     dw 0
+seconds     dw 0
+minsAux     db "00",'$'
+twoPts      db ":",'$'
+secsAux     db "00",'$'
 ;------------------------Login & Register variables--------------------------
 msgRegister db "Registro",10,"========",10,10,'$'
 msgLogin    db "Ingresar",10,"========",10,10,'$'

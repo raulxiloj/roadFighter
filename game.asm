@@ -2,10 +2,12 @@ initGame macro
     setVideoMode
     ;----------------SETUP----------------
     drawString 0, 1, userName       ;user
-    drawChar 0, 12, 78              ;level N
-    drawChar 0, 13, 49              ;#
-    drawString 0, 21, pointsAux     ;points
-    drawString 0, 71, time          ;time
+    drawChar 0, 13, 78              ;level N
+    drawChar 0, 14, 49              ;#
+    drawString 0, 22, pointsAux     ;points
+    drawString 0, 74, minsAux       ;--time--
+    drawString 0, 76, twoPts     
+    drawString 0, 77, secsAux       
     paintBoard 0fh
     paintBackground 7
     mov currPos, 50072
@@ -59,12 +61,48 @@ LOCAL while, refresh, moveCar, moveRight, moveLeft, pauseGame, finishGame
         jmp refresh
 
     refresh:
+        Delay 1000
+        updateTime
         ;moveObjects
         jmp while
 
     finishGame:
         ;save result of game
 
+endm
+
+updateTime macro
+LOCAL mins, secs, finish
+    xor cx, cx
+    inc seconds 
+    cmp seconds, 60
+    jge mins
+
+    secs:
+        cmp seconds, 9
+        jg twoDigits
+        
+        oneDigit:
+            mov cx, seconds
+            add cx, 48
+            mov secsAux[1], cl
+            jmp finish
+        twoDigits:
+            convertAscii seconds, secsAux
+            jmp finish
+    mins:
+        ;i should check if the minutes are up to 10 but i really doubt it so fk it 
+        mov seconds, 0
+        mov secsAux[0], '0'
+        mov secsAux[1], '0'
+        inc minutes
+        mov cx, minutes
+        add cx, 48
+        mov minsAux[1], cl
+    finish:
+        drawString 0, 74, minsAux       
+        drawString 0, 76, twoPts        
+        drawString 0, 77, secsAux 
 endm
 
 ;-----------------------------------------------------------------------------
