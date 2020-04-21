@@ -83,6 +83,35 @@ clearScreen macro
     printChar 10
 endm
 
+;-----Macro to convert an 'int' to 'string'-----
+convertAscii macro num,buffer
+LOCAL divide,getDigits,cleanRemainder
+    xor si, si    
+    xor bx, bx      
+    xor cx, cx      ;count digits
+    mov bl, 10      ;divisor
+    mov ax, num
+    jmp divide
+    
+    cleanRemainder:
+        xor ah,ah
+    divide:
+        div bl          ;ax = al/bl
+        inc cx          ;count digits
+        push ax         
+        cmp al, 0       ;quotient == 0? 
+        je getDigits   
+        jmp cleanRemainder
+    getDigits:
+        pop ax
+        add ah,48
+        mov buffer[si],ah
+        inc si
+        loop getDigits
+        mov ah, 24h
+        mov buffer[si],ah
+endm
+
 ;-------------------DELAY-----------------------
 Delay macro constante
 LOCAL D1,D2,Fin
@@ -352,7 +381,7 @@ adminSession macro
     jmp menuPrincipal
 endm
 
-;---------------------------NORMAL USER-----------------------------------
+;-----------------------------NORMAL USER-----------------------------------
 userSession macro
 LOCAL menu, startGame, logout
     menu:
