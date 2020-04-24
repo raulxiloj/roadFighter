@@ -277,7 +277,7 @@ LOCAL while, finish, continue, notEqual, equal
     finish:
 endm
 
-;---------------------------------------------------------------------------------
+;------------------------------LOGIN-------------------------------------
 loginAccess macro
 LOCAL isAdmin, isUser, error
     print msgLogin

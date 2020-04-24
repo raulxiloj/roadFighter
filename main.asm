@@ -15,14 +15,19 @@ userMenu    db 10,"1. Iniciar juego",10,"2. Cargar juego",10,"3. Logout",10,10,"
 adminMenu   db 10,"1. Top 10 puntos",10,"2. Top 10 tiempo",10,"3. Logout",10,10,"Ingrese una opcion: ",'$'
 comma       db ","
 newLine     db 10,'$'
-;------------------------------Game var's---------------------------------------
+;------------------------------Game vars---------------------------------------
 currPos     dw ?                ;Actual position of  the car              
 points      dw ?                ;var for managing points
 pointsAux   db "000",'$'         
-awards      db 30 dup ('$')     ;array of awards blocks
-obstacles   db 30 dup ('$')     ;array of obstacles blocks
-blocks      db 99 dup (0)
-auxBlock    db 3 dup (0)
+awards      dw 40 dup (0)     ;array of awards blocks - 10 blocks
+obstacles   dw 40 dup (0)     ;array of obstacles blocks
+numAwards   db 0
+numObs      db 0
+timeAward   db 0              ;how often appear
+timeObs     db 0            
+timeAux1    db 0             
+timeAux2    db 0
+timeLevel   dw 0              
 ;-------Time game-------
 minutes     dw 0
 seconds     dw 0

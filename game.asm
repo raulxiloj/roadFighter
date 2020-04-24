@@ -10,19 +10,15 @@ initGame macro
     drawString 0, 77, secsAux       
     paintBoard 0fh
     paintBackground 7
+    initAwardsBlocks
+    mov timeAward, 5
     mov currPos, 50072
     drawCar 50072              ;Initial position of the car 
-    ;------------------------------------------------
-    mov auxBlock[0],'G'
-    mov auxBlock[1], 21
-    mov auxBlock[2], 15
+    ;--------------------
+    ;getPosition awards[28],awards[30]
+    ;drawBlock ax, 0Eh, 0Ch
+    ;--------------------
     runGame
-    ;macroTemp 
-    ;------------------------------------------------
-    ;drawBlock 19050, 2 ,0Ah     
-    ;drawBlock 25650, 0Eh , 0Ch
-    ;moveCar
-    ;getChar
     setTextMode
 endm
 
@@ -39,8 +35,8 @@ LOCAL while, refresh, moveCar, moveRight, moveLeft, pauseGame, finishGame
         je moveLeft
         cmp ah, 4Dh      
         je moveRight
-        ;cmp al, 27      ;ESC 
-        ;je pauseGame
+        cmp al, 27      ;ESC 
+        je pauseGame
         cmp al, 32      ;Space
         je finishGame
     
@@ -59,15 +55,36 @@ LOCAL while, refresh, moveCar, moveRight, moveLeft, pauseGame, finishGame
         add currPos, 5
         drawCar currPos
         jmp refresh
+    
+    pauseGame:
+        getKey  
+        cmp al, 27      ;ESC 
+        je refresh
+        jmp pauseGame
 
     refresh:
-        Delay 1000
+        Delay 1200
         updateTime
-        ;moveObjects
+        push bx
+        moveAwards
+        pop bx
+        inc timeAux1
+        inc timeAux2
+        generateAwards
+
+        ;TODO check points to finish
+        ;cmp points, 0
+        ;jl finishGame
+        ;TODO check time level 
+        ;cmp timeLevel, 
+        ;je fin
         jmp while
 
     finishGame:
         ;save result of game
+        cleanTime
+        mov numAwards, 0
+        mov timeAux1, 0
 
 endm
 
@@ -105,32 +122,31 @@ LOCAL mins, secs, finish
         drawString 0, 77, secsAux 
 endm
 
-;-----------------------------------------------------------------------------
-;TEMP MACRO for testing 
-fillArrayBlocks macro
+;----------------------------------------------------------------------------- 
+initAwardsBlocks macro
 LOCAL while, addY, subY, continue
+    ;RANDOM VAR for custom positions TODOOOOOOOOOO
     xor bx, bx
     xor cx, cx
-
+    mov cx, 15
     while:
-        mov awards[bx], 'G'
-        mov awards[bx + 1], 20            ;x
-        mov awards[bx + 2], cx            ;y
-        add bx, 3
+        mov awards[bx], 21                ;i
+        mov awards[bx + 2], cx            ;j
+        add bx, 4
 
     addY:
-        add cx, 25
-        cmp cx, 290
+        add cx, 50
+        cmp cx, 285
         jge subY
         jmp continue
 
     subY:
-        sub cx, 25
-        cmp cx, 10
+        sub cx, 200
+        cmp cx, 15
         jle addY
 
     continue:
-        cmp bx, 30
+        cmp bx, 40
         jne while
 
 endm
@@ -139,51 +155,81 @@ getPosition macro coorX, coorY
     xor ax, ax
     xor bx, bx
     mov ax, 320
-    mov bl, coorX
+    mov bx, coorX
     mul bx
-    mov bl, coorY
+    mov bx, coorY
     add ax, bx
 endm
 
-macroTemp macro
-LOCAL while, continue, startAgain, finish
-    getPosition auxBlock[1], auxBlock[2]
-    drawBlock ax, 0Eh, 0Ch
-    add auxBlock[1], 4
-    xor bx, bx
+moveAwards macro
+LOCAL while, continue, startAgain, finish, for
+    xor si, si
+    xor cx, cx
+    mov cl, numAwards
     while:
-       
-        push bx
+        cmp cl, 0
+        je finish
+        push cx
+        getPosition awards[si], awards[si+2]
         eraseBlock ax
-        pop bx
-        mov bl, auxBlock[1]
-        add bl, 2
-        mov auxBlock[1], bl
-        cmp auxBlock[1], 170        
-        jae startAgain            
-        
-        continue:
-            push bx
-            getPosition auxBlock[1], auxBlock[2]
-            drawBlock ax, 0Eh, 0Ch
-            pop bx
-            Delay 400
-            jmp while
+        pop cx 
+        add awards[si], 5
+        cmp awards[si], 170
+        jae startAgain
+        jmp continue
 
-        startAgain:
-            mov auxBlock[1], 21
-            xor bx, bx
-            jmp continue
+    startAgain:
+        mov awards[si], 21
+        dec numAwards
+        ;---------------------
+        push si
+        xor si, si
+        for:
+            xor ax, ax
+            mov ax, awards[si+4]
+            mov awards[si], ax
+            mov ax, awards[si+6]
+            mov awards[si + 2], ax 
+            add si, 4
+            cmp si, 36
+            jne for
+            ;generate random xd
+            mov awards[36], 21
+            mov awards[38], 50
+        pop si
+        ;---------------------
+        jmp while
+
+    continue:
+        push cx
+        getPosition awards[si], awards[si+2]
+        drawBlock ax, 0Eh, 0Ch
+        pop cx
+        add si, 4
+        dec cl
+        jmp while
+
+    finish:
 
 endm
 
-movingAwards macro
-LOCAL while
-xor bx, bx
-    while:
-        awards[bx+1], 1
-        awards[bx+2], 2
-        add bx, 3
-        cmp bx, 30
-        jne while 
+generateAwards macro
+    mov al, timeAux1
+    cmp al, timeAward
+    jne finish
+
+    inc numAwards
+    mov timeAux1, 0
+
+    finish:
+
+endm
+
+cleanTime macro
+    mov minutes,0
+    mov seconds,0
+    mov minsAux[0], '0'
+    mov minsAux[1], '0'
+    mov secsAux[0], '0'
+    mov secsAux[1], '0'
 endm
