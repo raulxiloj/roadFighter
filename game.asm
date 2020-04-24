@@ -11,17 +11,16 @@ initGame macro
     paintBoard 0fh
     paintBackground 7
     initAwardsBlocks
+    initObstaclesBlocks
     mov timeAward, 5
+    mov timeObs, 10
     mov currPos, 50072
     drawCar 50072              ;Initial position of the car 
-    ;--------------------
-    ;getPosition awards[28],awards[30]
-    ;drawBlock ax, 0Eh, 0Ch
-    ;--------------------
     runGame
     setTextMode
 endm
 
+;------------------------Main macro for the game-----------------------------
 runGame macro
 LOCAL while, refresh, moveCar, moveRight, moveLeft, pauseGame, finishGame
     while: 
@@ -66,12 +65,13 @@ LOCAL while, refresh, moveCar, moveRight, moveLeft, pauseGame, finishGame
         Delay 1200
         updateTime
         push bx
-        moveAwards
+        moveBlocks awards, numAwards, 0
+        moveBlocks obstacles, numObs, 1         
         pop bx
         inc timeAux1
         inc timeAux2
         generateAwards
-
+        generateObstacles
         ;TODO check points to finish
         ;cmp points, 0
         ;jl finishGame
@@ -87,6 +87,7 @@ LOCAL while, refresh, moveCar, moveRight, moveLeft, pauseGame, finishGame
         mov timeAux1, 0
 
 endm
+;----------------------------------------------------------------------------
 
 updateTime macro
 LOCAL mins, secs, finish
@@ -122,10 +123,9 @@ LOCAL mins, secs, finish
         drawString 0, 77, secsAux 
 endm
 
-;----------------------------------------------------------------------------- 
+;--------------------------Init positions of blocks---------------------------
 initAwardsBlocks macro
 LOCAL while, addY, subY, continue
-    ;RANDOM VAR for custom positions TODOOOOOOOOOO
     xor bx, bx
     xor cx, cx
     mov cx, 15
@@ -151,6 +151,34 @@ LOCAL while, addY, subY, continue
 
 endm
 
+initObstaclesBlocks macro
+LOCAL while, addY, subY, continue
+    xor bx, bx
+    xor cx, cx
+    mov cx, 43
+
+    while:
+        mov obstacles[bx], 21       ;i
+        mov obstacles[bx + 2], cx   ;j
+        add bx, 4
+
+    addY:
+        add cx, 50
+        cmp cx, 285 
+        jge subY 
+        jmp continue
+    
+    subY:
+        sub cx, 200
+        cmp cx, 15
+        jle addY
+    
+    continue:
+        cmp bx, 40
+        jne while 
+endm
+
+;------------------------------------------------------------------------------
 getPosition macro coorX, coorY
     xor ax, ax
     xor bx, bx
@@ -161,49 +189,64 @@ getPosition macro coorX, coorY
     add ax, bx
 endm
 
-moveAwards macro
-LOCAL while, continue, startAgain, finish, for
+moveBlocks macro array, num, type
+LOCAL while, continue, startAgain, finish, for, drawObs, auxContinue
     xor si, si
     xor cx, cx
-    mov cl, numAwards
+    mov cl, num
     while:
         cmp cl, 0
         je finish
         push cx
-        getPosition awards[si], awards[si+2]
+        getPosition array[si], array[si+2]
         eraseBlock ax
         pop cx 
-        add awards[si], 5
-        cmp awards[si], 170
+        add array[si], 5
+        cmp array[si], 170
         jae startAgain
         jmp continue
 
     startAgain:
-        mov awards[si], 21
-        dec numAwards
+        mov array[si], 21
+        dec num
         ;---------------------
         push si
         xor si, si
+        xor ax, ax
+        mov ax, array[0]
+        mov auxBlock[0], ax
+        mov ax, array[2]
+        mov auxBlock[2], ax
         for:
             xor ax, ax
-            mov ax, awards[si+4]
-            mov awards[si], ax
-            mov ax, awards[si+6]
-            mov awards[si + 2], ax 
+            mov ax, array[si+4]
+            mov array[si], ax
+            mov ax, array[si+6]
+            mov array[si + 2], ax 
             add si, 4
             cmp si, 36
             jne for
-            ;generate random xd
-            mov awards[36], 21
-            mov awards[38], 50
+            ;-------------------
+            mov ax, auxBlock[0]
+            mov array[36], ax
+            mov ax, auxBlock[2]
+            mov array[38], ax
         pop si
         ;---------------------
         jmp while
 
     continue:
         push cx
-        getPosition awards[si], awards[si+2]
-        drawBlock ax, 0Eh, 0Ch
+        getPosition array[si], array[si+2]
+        mov cl, type
+        cmp cl, 0 ;yellow 
+        jne drawObs
+        ;draw award
+            drawBlock ax, 0Eh, 0Ch
+            jmp auxContinue
+        drawObs:
+            drawBlock ax, 2, 0Ah
+        auxContinue:
         pop cx
         add si, 4
         dec cl
@@ -214,6 +257,7 @@ LOCAL while, continue, startAgain, finish, for
 endm
 
 generateAwards macro
+LOCAL finish
     mov al, timeAux1
     cmp al, timeAward
     jne finish
@@ -223,6 +267,18 @@ generateAwards macro
 
     finish:
 
+endm
+
+generateObstacles macro
+LOCAL finish
+    mov al, timeAux2
+    cmp al, timeObs
+    jne finish 
+
+    inc numObs
+    mov timeAux2, 0
+
+    finish:
 endm
 
 cleanTime macro

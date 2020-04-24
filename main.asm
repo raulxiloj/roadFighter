@@ -34,6 +34,8 @@ seconds     dw 0
 minsAux     db "00",'$'
 twoPts      db ":",'$'
 secsAux     db "00",'$'
+;-----------------------
+auxBlock    dw 4 dup (0)
 ;------------------------Login & Register variables--------------------------
 msgRegister db "Registro",10,"========",10,10,'$'
 msgLogin    db "Ingresar",10,"========",10,10,'$'
