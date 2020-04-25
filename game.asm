@@ -59,10 +59,12 @@ LOCAL while, refresh, moveCar, moveRight, moveLeft, pauseGame, finishGame
         getKey  
         cmp al, 27      ;ESC 
         je refresh
+        cmp al, 32      ;Space
+        je finishGame
         jmp pauseGame
 
     refresh:
-        Delay 1200
+        Delay 1000
         updateTime
         push bx
         moveBlocks awards, numAwards, 0
@@ -72,6 +74,7 @@ LOCAL while, refresh, moveCar, moveRight, moveLeft, pauseGame, finishGame
         inc timeAux2
         generateAwards
         generateObstacles
+        checkCollision awards, numAwards, 0
         ;TODO check points to finish
         ;cmp points, 0
         ;jl finishGame
@@ -84,46 +87,12 @@ LOCAL while, refresh, moveCar, moveRight, moveLeft, pauseGame, finishGame
         ;save result of game
         cleanTime
         mov numAwards, 0
+        mov numObs, 0
         mov timeAux1, 0
-
-endm
-;----------------------------------------------------------------------------
-
-updateTime macro
-LOCAL mins, secs, finish
-    xor cx, cx
-    inc seconds 
-    cmp seconds, 60
-    jge mins
-
-    secs:
-        cmp seconds, 9
-        jg twoDigits
-        
-        oneDigit:
-            mov cx, seconds
-            add cx, 48
-            mov secsAux[1], cl
-            jmp finish
-        twoDigits:
-            convertAscii seconds, secsAux
-            jmp finish
-    mins:
-        ;i should check if the minutes are up to 10 but i really doubt it so fk it 
-        mov seconds, 0
-        mov secsAux[0], '0'
-        mov secsAux[1], '0'
-        inc minutes
-        mov cx, minutes
-        add cx, 48
-        mov minsAux[1], cl
-    finish:
-        drawString 0, 74, minsAux       
-        drawString 0, 76, twoPts        
-        drawString 0, 77, secsAux 
+        mov timeAux2, 0
 endm
 
-;--------------------------Init positions of blocks---------------------------
+;------------------------Init positions of blocks----------------------------
 initAwardsBlocks macro
 LOCAL while, addY, subY, continue
     xor bx, bx
@@ -281,6 +250,114 @@ LOCAL finish
     finish:
 endm
 
+;--------------------------------COLLISSIONS------------------------------------
+checkCollision macro array, num, type 
+LOCAL for, while, colission, finish, for2, continue, col
+    push bx
+    xor bx, bx
+    xor si, si
+    mov cl, num
+    cmp cl, 0 
+    jbe finish
+    int 3
+    for: 
+        
+        getPosition array[si], array[si + 2]
+        add ax, 6400
+        ;while:
+            ;int 3
+            cmp ax, currPos
+            ja col
+            jmp continue
+            col:
+            mov bx, currPos
+            add bx, 20
+            cmp ax, bx
+            jb colission
+            continue:
+        ;    add ax, 5
+        ;    add bx, 5
+        ;    cmp bx, 20
+        ;    jne while
+    xor ax, ax
+    ;xor bx, bx
+    dec cl
+    add si, 4
+    cmp cl, 0
+    jne for
+    jmp finish
+
+    colission:
+        ;---------------------
+        sub ax, 6400
+        eraseBlock ax
+        dec num 
+        mov ax, array[si]
+        mov auxBlock[0], ax
+        mov ax, array[si + 2]
+        mov auxBlock[2], ax
+        for2:
+            xor ax, ax
+            mov ax, array[si+4]
+            mov array[si], ax
+            mov ax, array[si+6]
+            mov array[si+2], ax
+            add si, 4
+            cmp si, 36
+            jne for2
+        mov ax, auxBlock[0]
+        mov array[36], ax
+        mov ax, auxBlock[2]
+        mov array[38], ax
+        ;---------------------
+        mov al, type
+        cmp al, 0   ;awards
+        jne sub3
+
+        add points,3 
+        jmp finish
+        sub3:
+            sub points, 3
+    finish:
+    pop bx
+    updatePoints
+endm
+
+;----------------------------------TIME------------------------------------------
+updateTime macro
+LOCAL mins, secs, finish
+    xor cx, cx
+    inc seconds 
+    cmp seconds, 60
+    jge mins
+
+    secs:
+        cmp seconds, 9
+        jg twoDigits
+        
+        oneDigit:
+            mov cx, seconds
+            add cx, 48
+            mov secsAux[1], cl
+            jmp finish
+        twoDigits:
+            convertAscii seconds, secsAux
+            jmp finish
+    mins:
+        ;i should check if the minutes are up to 10 but i really doubt it so fk it 
+        mov seconds, 0
+        mov secsAux[0], '0'
+        mov secsAux[1], '0'
+        inc minutes
+        mov cx, minutes
+        add cx, 48
+        mov minsAux[1], cl
+    finish:
+        drawString 0, 74, minsAux       
+        drawString 0, 76, twoPts        
+        drawString 0, 77, secsAux 
+endm
+
 cleanTime macro
     mov minutes,0
     mov seconds,0
@@ -288,4 +365,9 @@ cleanTime macro
     mov minsAux[1], '0'
     mov secsAux[0], '0'
     mov secsAux[1], '0'
+endm
+
+updatePoints macro
+    convertAscii points, pointsAux
+    drawString 0, 22, pointsAux
 endm
