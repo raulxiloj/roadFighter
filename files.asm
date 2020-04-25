@@ -2,6 +2,23 @@
 ;------------------macros para manejar ficheros----------------
 ;--------------------------------------------------------------
 
+;macro para obtener la ruta dada por un usuario
+;similar al de getTexto, la unica diferencia es el fin de cadena
+getPath macro array
+LOCAL getCadena, finCadena
+    mov si,0    ;xor si,si
+    getCadena:
+        getChar
+        cmp al,0dh
+        je finCadena
+        mov array[si],al
+        inc si
+        jmp getCadena
+    finCadena:
+    mov al,00h
+    mov array[si],al
+endm
+
 ;macro para abrir un fichero
 ;param file = nombre del archivo
 ;param &handler = num del archivo
@@ -77,7 +94,7 @@ endm
 ;-----------------------------------------------------------------------------------------
 getUsersData macro
     openFile userFile, handler
-    readFile handler, usersData, 1000 
+    readFile handler, fileData, 1000 
     closeFile handler
 endm
 

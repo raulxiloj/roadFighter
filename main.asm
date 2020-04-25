@@ -17,13 +17,13 @@ comma       db ","
 newLine     db 10,'$'
 ;------------------------------Game vars---------------------------------------
 currPos     dw ?                ;Actual position of  the car              
-points      dw ?                ;var for managing points
-pointsAux   db "000",'$'         
-awards      dw 40 dup (0)     ;array of awards blocks - 10 blocks
-obstacles   dw 40 dup (0)     ;array of obstacles blocks
+points      dw 3                ;var for managing points
+pointsAux   db "3$$",'$'         
+awards      dw 40 dup (0)       ;array of awards blocks - 10 blocks
+obstacles   dw 40 dup (0)       ;array of obstacles blocks
 numAwards   db 0
 numObs      db 0
-timeAward   db 0              ;how often appear
+timeAward   db 0                ;how often appear
 timeObs     db 0            
 timeAux1    db 0             
 timeAux2    db 0
@@ -49,9 +49,11 @@ adminName   db "admin"
 adminPass   db "1234"
 ;------------------------File messages and variables-------------------------
 userFile    db "c:\pro\users.txt",0
-usersData   db 1000 dup('$')
+inputFile   db 50 dup ('$')
+fileData    db 1000 dup('$')
 fileSize    dw 0
 handler     dw ?
+msgFile     db 10,10,"Ingrese la ruta del archivo de entrada: ",'$'    
 userSaved   db 10,"Usuario registrado correctamente ",'$'
 ;----------------------------Possibles errors--------------------------------
 error1      db 10,13,"ERROR: Opcion invalida",10,13,'$'
@@ -91,7 +93,6 @@ main proc
         registerUser
         jmp menuPrincipal
     invalidChar:
-
         jmp menuPrincipal
     errorOpening:
         print error2

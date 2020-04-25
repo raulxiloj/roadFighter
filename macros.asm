@@ -1,8 +1,10 @@
 ;--------------------------------------------------------------
-;-----------------------macros generales-----------------------
+;-----------------------GENERAL MACROS-------------------------
 ;--------------------------------------------------------------
 
-;-------------BASIC MACROS--------------
+;-----------------------------------------------
+;-----------------BASIC MACROS------------------
+;-----------------------------------------------
 print macro cadena
     mov ah, 09h
     mov dx, offset cadena
@@ -134,7 +136,9 @@ LOCAL D1,D2,Fin
         pop si
 endm
 
-;------------------------------------------------------------------------------------
+;-----------------------------------------------------------------------------
+;-------------------------------REGISTER--------------------------------------
+;-----------------------------------------------------------------------------
 registerUser macro
 LOCAL checkUserLength, continue, errorLength1, errorLength2, finish, checkPassLength, checkNameUsed
     print msgRegister
@@ -214,7 +218,7 @@ LOCAL while, changeState, continue, checkName , finish
         cmp si, fileSize
         je finish
         xor ah, ah
-        mov al, usersData[si]
+        mov al, fileData[si]
         cmp al, 10
         je checkName 
         cmp al, ','
@@ -245,6 +249,7 @@ LOCAL while, changeState, continue, checkName , finish
         jmp continue
     finish:
         cleanBuffer auxUser, SIZEOF auxUser, 24h
+        cleanBuffer fileData, SIZEOF fileData, 24h
 endm
 
 ;return dx (0 = not equal, 1 = equal)
@@ -277,7 +282,9 @@ LOCAL while, finish, continue, notEqual, equal
     finish:
 endm
 
-;------------------------------LOGIN-------------------------------------
+;-------------------------------------------------------------------------
+;-------------------------------LOGIN-------------------------------------
+;-------------------------------------------------------------------------
 loginAccess macro
 LOCAL isAdmin, isUser, error
     print msgLogin
@@ -323,7 +330,7 @@ LOCAL while, checkUser, changeState, state1, state2, continue, finish
         cmp si, fileSize
         je finish
         xor ah, ah
-        mov al, usersData[si]
+        mov al, fileData[si]
         cmp al, 10
         je checkUser 
         cmp al, ','
@@ -369,10 +376,12 @@ LOCAL while, checkUser, changeState, state1, state2, continue, finish
     jmp continue
 
     finish:
-    
+        cleanBuffer fileData, SIZEOF fileData, 24h
 endm
 
-;-----------------------------ADMIN MODE------------------------------
+;--------------------------------------------------------------------------
+;-----------------------------ADMIN MODE-----------------------------------
+;--------------------------------------------------------------------------
 adminSession macro
     clearScreen
     print header2
@@ -381,7 +390,9 @@ adminSession macro
     jmp menuPrincipal
 endm
 
-;-----------------------------NORMAL USER-----------------------------------
+;-------------------------------------------------------------------------=
+;-----------------------------NORMAL USER----------------------------------
+;--------------------------------------------------------------------------
 userSession macro
 LOCAL menu, startGame, logout
     menu:
@@ -392,13 +403,17 @@ LOCAL menu, startGame, logout
         cmp al, '1'
         je startGame
         cmp al, '2'
-        je menuPrincipal
+        je chargeGame
         cmp al, '3'
         je logout
         jmp menu
     startGame:
         initGame
         jmp menu    
+    chargeGame:
+        print msgFile
+        getPath inputFile
+        jmp menu
     logout:
         cleanBuffer userName, SIZEOF username, 24h
         cleanBuffer userPass, SIZEOF userPass, 24h
