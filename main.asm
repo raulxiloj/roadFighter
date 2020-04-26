@@ -36,12 +36,16 @@ twoPts      db ":",'$'
 secsAux     db "00",'$'
 ;-----------------------
 auxBlock    dw 4 dup (0)
+;------Levels data------
+numLevels   db 0
+currLevel   db 0
+dataLevels  db 42 dup (0)
 ;------------------------Login & Register variables--------------------------
 msgRegister db "Registro",10,"========",10,10,'$'
 msgLogin    db "Ingresar",10,"========",10,10,'$'
 inputName   db "Username: ",'$'
 userName    db 15 dup ('$')
-inputPass   db "Password: "
+inputPass   db "Password: ",'$'
 userPass    db 10 dup ('$')
 auxUser     db 15 dup ('$')
 auxPass     db 4 dup ('$')
@@ -49,10 +53,12 @@ adminName   db "admin"
 adminPass   db "1234"
 ;------------------------File messages and variables-------------------------
 userFile    db "c:\pro\users.txt",0
-inputFile   db 50 dup ('$')
+;inputFile   db 50 dup ('$')
+inputFile   db "c:\pro\prueba.txt",0    ;bugs with other extension
 fileData    db 1000 dup('$')
 fileSize    dw 0
 handler     dw ?
+auxFile     db 10 dup ('$')
 msgFile     db 10,10,"Ingrese la ruta del archivo de entrada: ",'$'    
 userSaved   db 10,"Usuario registrado correctamente ",'$'
 ;----------------------------Possibles errors--------------------------------

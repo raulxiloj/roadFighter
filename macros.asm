@@ -412,7 +412,8 @@ LOCAL menu, startGame, logout
         jmp menu    
     chargeGame:
         print msgFile
-        getPath inputFile
+        ;getPath inputFile
+        analisis
         jmp menu
     logout:
         cleanBuffer userName, SIZEOF username, 24h
