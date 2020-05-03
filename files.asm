@@ -136,7 +136,6 @@ LOCAL while, continue, finish, state0, state1, state2, state3, state4, state5, s
     xor cx, cx  ;actual char of fileData
 
     while:
-        int 3
         cmp si, fileSize
         je finish
         
@@ -324,4 +323,136 @@ LOCAL while, continue, finish, state0, state1, state2, state3, state4, state5, s
             jmp while
     finish:
 
+endm
+
+;---------------------------------------------------------------
+getTopData macro
+    ;read the file
+    openFile top1File, handler
+    readFile handler, fileData, SIZEOF fileData
+    closeFile handler
+    ;print data (just to see, everything is fine)
+    ;print newLine
+    ;print fileData
+    ;print newLine
+    ;split data and save it into the array
+    readTop1
+    printArrayTop
+    getChar
+    cleanBuffer fileData, SIZEOF fileData, 24h
+endm
+
+readTop1 macro
+LOCAL while, continue, finish, finish0, finish1, finish2
+    
+    xor si, si
+    xor di, di  ;pos array
+    xor ax, ax  ;state 
+    xor bx, bx  ;pos auxTop
+    xor cx, cx  ;counter rows
+    xor dx, dx  ;actual char
+
+    while:
+        cmp si, fileSize
+        je finish
+
+        mov dl, fileData[si]
+        cmp ax, 0
+        je state0
+        cmp ax, 1
+        je state1
+        cmp ax, 2
+        je state2
+
+    state0: ;row
+        cmp dl, ','
+        jne continue
+        inc ax
+        mov arrayTop[di], cl
+        inc di
+        jmp continue
+
+    state1: ;level
+        cmp dl, ','
+        je finish1
+
+        mov auxTop[bx], dl
+        inc bx
+        jmp continue
+
+        finish1:
+            xor bx, bx
+            inc ax
+            ;save number
+            pusha
+            convertNumber auxTop
+            mov arrayTop[di], al
+            popa
+            inc di
+            ;clean aux
+            push si
+            push cx
+            cleanBuffer auxTop, SIZEOF auxTop, 24h
+            pop cx
+            pop si
+            jmp continue
+    
+    state2: ;pts 
+        cmp dl, 13
+        je continue
+        cmp dl, 10
+        je finish2
+
+        mov auxTop[bx], dl
+        inc bx
+        jmp continue
+
+        finish2:
+            xor bx, bx
+            xor ax, ax
+            ;save number
+            pusha
+            convertNumber auxTop
+            mov arrayTop[di], al
+            popa
+            inc di 
+            inc cx
+            inc nElements
+            ;clean aux
+            push si
+            push cx
+            cleanBuffer auxTop, SIZEOF auxTop, 24h
+            pop cx
+            pop si
+
+    continue:
+        inc si
+        jmp while
+
+    finish:
+        
+endm
+
+printArrayTop macro
+LOCAL while, finish
+    xor si, si
+    xor ax, ax
+    xor cx, cx
+    mov si, 2
+    while:
+        cmp cx, 8
+        je finish
+        
+        mov al, arrayTop[si]
+        pusha 
+        convertAscii ax, auxd
+        print newLine
+        print auxd
+        cleanBuffer auxd, SIZEOF auxd, 24h
+        popa
+        inc cx
+        add si, 3
+        jmp while
+
+    finish:
 endm
