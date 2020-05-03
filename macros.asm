@@ -114,6 +114,56 @@ LOCAL divide,getDigits,cleanRemainder
         mov buffer[si],ah
 endm
 
+;-----Macro to convert ascii to number
+;return ax
+convertNumber macro num
+LOCAL three, two, finish
+    xor ax, ax
+    xor bx, bx
+    xor dx, dx
+    
+    getLength num
+    cmp si, 3
+    je three
+    cmp si, 2
+    je two
+    
+    mov al, num[0]
+    sub al, 48
+    jmp finish
+
+    three:  ;ex: num = 330 
+        mov ax, 100
+        mov bl, num[0]
+        sub bl, 48
+        mul bx
+        ;---------------
+        mov dx, ax
+        xor ax, ax
+        mov ax, 10
+        mov bl, num[1]
+        sub bl, 48
+        mul bx 
+        add ax, dx
+        ;---------------
+        mov bl, num[2]
+        sub bl, 48
+        add ax, bx
+        jmp finish
+
+    two:    ;ex: num = 80
+        mov ax, 10
+        mov bl, num[0]
+        sub bl, 48
+        mul bx 
+        mov bl, num[1]
+        sub bl, 48
+        add ax, bx
+
+    finish:
+
+endm
+
 ;-------------------DELAY-----------------------
 Delay macro constante
 LOCAL D1,D2,Fin
@@ -383,11 +433,34 @@ endm
 ;-----------------------------ADMIN MODE-----------------------------------
 ;--------------------------------------------------------------------------
 adminSession macro
-    clearScreen
-    print header2
-    print adminMenu
-    getChar
-    jmp menuPrincipal
+LOCAL menu, topPuntos, topTiempo, logout
+    menu:
+        clearScreen
+        print header2
+        print adminMenu
+        getChar
+        cmp al, '1'
+        je topPuntos
+        cmp al, '2'
+        je topTiempo
+        cmp al, '3'
+        je logout
+        jmp menu
+
+    topPuntos:
+        getTopData
+        bubbleSortAsc arrayTop
+        printArrayTop
+        getChar
+        jmp menu
+    topTiempo:
+
+        jmp menu
+    logout:
+        cleanBuffer userName, SIZEOF username, 24h
+        cleanBuffer userPass, SIZEOF userPass, 24h
+        jmp menuPrincipal
+
 endm
 
 ;-------------------------------------------------------------------------=
