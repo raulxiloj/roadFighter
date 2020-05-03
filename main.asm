@@ -2,6 +2,7 @@ include macros.asm
 include graphics.asm
 include files.asm
 include game.asm
+include sorting.asm
 
 .model small
 ;-----Stack segment-----
@@ -40,6 +41,20 @@ auxBlock    dw 4 dup (0)
 numLevels   db 0
 currLevel   db 0
 dataLevels  db 42 dup (0)
+;--------------------------------TOP 10--------------------------------------
+arrayTop    db 300 dup ('$')
+auxTop      db 5 dup ('$')
+top1File    db "c:\pro\top1.txt",0  ;top players
+top2File    db "c:\pro\top2.txt",0  ;top time
+auxd        db 5 dup ('$')
+;------sorting------
+;Bubblesort
+nElements   db 0
+vari        db 0
+varj        db 0
+auxSort     db 0
+auxSort2    db 0
+auxSort3    db 0
 ;------------------------Login & Register variables--------------------------
 msgRegister db "Registro",10,"========",10,10,'$'
 msgLogin    db "Ingresar",10,"========",10,10,'$'
