@@ -13,6 +13,9 @@ LOCAL for, for2, continue, continue2, swap, finish
     for:
         cmp cl, nElements
         jge finish
+        pusha
+        statistics
+        popa
         for2:
             mov al, array[bx]
             mov ah, array[bx+3] 
@@ -50,28 +53,41 @@ LOCAL for, for2, continue, continue2, swap, finish
             jmp for 
         
     finish:
-
+        
 endm
 
 getMax macro
+LOCAL for, continue, swap
     xor ax, ax
-    xor bx, bx 
-    mov al, 3
-    mul nElements
-    mov bl, al
-    dec bl
-    mov al, arrayTop[bx]
-    mov numMax, ax
+    xor si, si
+    mov si, 2
+
+    for:
+        cmp cl, nElements
+        je finish
+
+        mov al, arrayTop[si]
+        cmp ax, numMax
+        jbe continue 
+        
+        ;change value
+        mov numMax, ax
+
+        continue:   
+            add si, 3
+            inc cx
+            jmp for
+    
+    finish:
+
 endm
 
 getSpaceBetween macro
     xor ax, ax
     xor bx, bx
-    xor dx, dx
     mov al, 5
     mul nElements
     mov spaceBtw, ax
-    mov dx, spaceBtw
 endm 
 
 getWidthBar macro
@@ -79,6 +95,7 @@ getWidthBar macro
     mov ax, 280
     sub ax, spaceBtw
     div nElements
+    xor ah, ah
     mov widthBar, ax
 endm
 
@@ -86,12 +103,12 @@ getScale macro val
     ;cleanBuffer auxd, sizeof auxd, 24h
     xor ax, ax
     xor bx, bx
-    mov ax, 170
+    mov ax, 140
     mov bl, val
     mul bx
-    mov bx, 100
+    mov bx, numMax
     div bx
-    mov bx, 190
+    mov bx, 170
     sub bx, ax
     mov ax, bx
     ;convertAscii ax, auxd
