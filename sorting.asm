@@ -1,9 +1,9 @@
 bubbleSortAsc macro array
 LOCAL for, for2, continue, continue2, swap, finish
     xor ax, ax  ;al actual -  ah siguiente
-    xor bx, bx  
-    xor cx, cx
-    mov bx, 2
+    xor bx, bx  ;access to array  
+    xor cx, cx  ;cl = cont for num of elements | ch = size of the array 
+    mov bx, 2   
 
     mov al, 3
     mul nElements
@@ -51,4 +51,50 @@ LOCAL for, for2, continue, continue2, swap, finish
         
     finish:
 
+endm
+
+getMax macro
+    xor ax, ax
+    xor bx, bx 
+    mov al, 3
+    mul nElements
+    mov bl, al
+    dec bl
+    mov al, arrayTop[bx]
+    mov numMax, ax
+endm
+
+getSpaceBetween macro
+    xor ax, ax
+    xor bx, bx
+    xor dx, dx
+    mov al, 5
+    mul nElements
+    mov spaceBtw, ax
+    mov dx, spaceBtw
+endm 
+
+getWidthBar macro
+    xor ax, ax
+    mov ax, 280
+    sub ax, spaceBtw
+    div nElements
+    mov widthBar, ax
+endm
+
+getScale macro val
+    ;cleanBuffer auxd, sizeof auxd, 24h
+    xor ax, ax
+    xor bx, bx
+    mov ax, 170
+    mov bl, val
+    mul bx
+    mov bx, 100
+    div bx
+    mov bx, 190
+    sub bx, ax
+    mov ax, bx
+    ;convertAscii ax, auxd
+    ;print auxd
+    ;return ax
 endm
