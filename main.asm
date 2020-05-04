@@ -55,6 +55,13 @@ varj        db 0
 auxSort     db 0
 auxSort2    db 0
 auxSort3    db 0
+numMax      dw 0
+spaceBtw    dw 0
+widthBar    dw 0
+auxBar      dw 0
+varX        dw 0
+auxBar2     dw 0
+colorBar    db 1
 ;------------------------Login & Register variables--------------------------
 msgRegister db "Registro",10,"========",10,10,'$'
 msgLogin    db "Ingresar",10,"========",10,10,'$'

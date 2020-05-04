@@ -337,8 +337,8 @@ getTopData macro
     ;print newLine
     ;split data and save it into the array
     readTop1
-    printArrayTop
-    getChar
+    ;printArrayTop
+    ;getChar
     cleanBuffer fileData, SIZEOF fileData, 24h
 endm
 
@@ -351,6 +351,7 @@ LOCAL while, continue, finish, finish0, finish1, finish2
     xor bx, bx  ;pos auxTop
     xor cx, cx  ;counter rows
     xor dx, dx  ;actual char
+    mov nElements, 0
 
     while:
         cmp si, fileSize
@@ -440,7 +441,7 @@ LOCAL while, finish
     xor cx, cx
     mov si, 2
     while:
-        cmp cx, 8
+        cmp cl, nElements
         je finish
         
         mov al, arrayTop[si]

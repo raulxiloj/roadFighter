@@ -450,11 +450,26 @@ LOCAL menu, topPuntos, topTiempo, logout
     topPuntos:
         getTopData
         bubbleSortAsc arrayTop
-        printArrayTop
-        getChar
+        ;---------------DEBUG-----------
+        ;printArrayTop
+        ;print newLine
+        ;print newLine
+        getMax 
+        ;print newLine
+        ;print newLine
+        getSpaceBetween
+        ;print newLine
+        ;print newLine
+        getWidthBar
+        ;print newLine
+        ;print newLine
+        ;getScale 90
+        ;--------------------------------
+        statistics
+        ;getChar
         jmp menu
     topTiempo:
-
+        statistics
         jmp menu
     logout:
         cleanBuffer userName, SIZEOF username, 24h
