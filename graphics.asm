@@ -323,7 +323,7 @@ statistics macro
     paintBoard 0fh
     drawBars
     ;drawBar 16050, 20, 7   ;(50,50)
-    getChar
+    Delay 2000
     setTextMode
 endm
 
@@ -354,7 +354,7 @@ LOCAL for, for2
             inc di
             cmp di, bx
             jne for2
-            cmp di, 60800 
+            cmp di, 54720 
             jb for
         
 endm
@@ -374,6 +374,7 @@ LOCAL while, finish
         mov auxBar, ax
         getPosition auxBar, varX  
         mov auxBar2, ax
+        getColor arrayTop[si]
         pusha 
         drawBar auxBar2, widthBar, colorBar
         popa
@@ -382,10 +383,45 @@ LOCAL while, finish
         mov dx, widthBar
         add varX, dx
         add varX, 5
-        inc colorBar
         jmp while
 
     finish:
 endm
 
-;drawBar 16050, 20, 7   ;(50,50)
+getColor macro val
+LOCAL red, blue, yellow, green, white, finish
+
+    white:
+        cmp val, 81
+        jl green
+
+        mov colorBar, 0Fh
+        jmp finish
+
+    green:
+        cmp val, 61 
+        jl yellow
+
+        mov colorBar,  2
+        jmp finish
+         
+    yellow:
+        cmp val, 41 
+        jl blue
+
+        mov colorBar,  0Eh
+        jmp finish
+
+    blue:
+        cmp val, 21
+        jl red
+
+        mov colorBar,  9
+        jmp finish
+
+    red:
+        mov colorBar, 4  
+
+    finish:
+    
+endm

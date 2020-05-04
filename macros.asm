@@ -449,23 +449,30 @@ LOCAL menu, topPuntos, topTiempo, logout
 
     topPuntos:
         getTopData
+        getMax
+        getSpaceBetween
+        getWidthBar
         bubbleSortAsc arrayTop
+        ;statistics
+        ;getMax
+        ;getSpaceBetween
+        ;getWidthBar
         ;---------------DEBUG-----------
         ;printArrayTop
         ;print newLine
         ;print newLine
-        getMax 
+        ;;getMax 
         ;print newLine
         ;print newLine
-        getSpaceBetween
+        ;;getSpaceBetween
         ;print newLine
         ;print newLine
-        getWidthBar
+        ;;getWidthBar
         ;print newLine
         ;print newLine
         ;getScale 90
         ;--------------------------------
-        statistics
+        ;;statistics
         ;getChar
         jmp menu
     topTiempo:
