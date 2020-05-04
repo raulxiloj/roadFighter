@@ -316,3 +316,76 @@ LOCAL while
         cmp si, 0
         jne while
 endm
+
+;--------------------------------BAR GRAPH------------------------------------
+statistics macro
+    setVideoMode 
+    paintBoard 0fh
+    drawBars
+    ;drawBar 16050, 20, 7   ;(50,50)
+    getChar
+    setTextMode
+endm
+
+drawBar macro pos, width, color
+LOCAL for, for2
+;bottom limit (189,320) = 60800     
+    xor ax, ax
+    xor bx, bx  ;limit width
+    xor cx, cx
+    mov dl, color
+    mov di, pos
+    
+    mov cx, di  ;aux
+    add cx, widthBar
+    mov bx, cx  ;limit width
+    mov cx, di
+
+    jmp for2
+
+    for:
+        
+        add bx, 320
+        mov di, cx
+        add di, 320
+        mov cx, di
+        for2:
+            mov es:[di], dl
+            inc di
+            cmp di, bx
+            jne for2
+            cmp di, 60800 
+            jb for
+        
+endm
+
+;Draw bars array
+drawBars macro array
+LOCAL while, finish
+    xor si, si
+    xor cx, cx
+    mov si, 2
+    mov varX, 20
+    int 3
+    while:
+        cmp cl, nElements
+        je finish
+        getScale arrayTop[si]
+        mov auxBar, ax
+        getPosition auxBar, varX  
+        mov auxBar2, ax
+        pusha 
+        drawBar auxBar2, widthBar, colorBar
+        popa
+        add si, 3
+        inc cx
+        mov dx, widthBar
+        add varX, dx
+        add varX, 5
+        inc colorBar
+        jmp while
+
+    finish:
+endm
+
+;drawBar 16050, 20, 7   ;(50,50)
