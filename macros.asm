@@ -433,7 +433,7 @@ endm
 ;-----------------------------ADMIN MODE-----------------------------------
 ;--------------------------------------------------------------------------
 adminSession macro
-LOCAL menu, topPuntos, topTiempo, logout
+LOCAL menu, topPuntos, topTiempo, logout, bubble, quick, shell, bubbleAsc, bubbleDesc
     menu:
         clearScreen
         print header2
@@ -448,33 +448,42 @@ LOCAL menu, topPuntos, topTiempo, logout
         jmp menu
 
     topPuntos:
+        ;----------------
         getTopData
         getMax
         getSpaceBetween
         getWidthBar
-        bubbleSortAsc arrayTop
-        ;statistics
-        ;getMax
-        ;getSpaceBetween
-        ;getWidthBar
-        ;---------------DEBUG-----------
-        ;printArrayTop
-        ;print newLine
-        ;print newLine
-        ;;getMax 
-        ;print newLine
-        ;print newLine
-        ;;getSpaceBetween
-        ;print newLine
-        ;print newLine
-        ;;getWidthBar
-        ;print newLine
-        ;print newLine
-        ;getScale 90
-        ;--------------------------------
-        ;;statistics
-        ;getChar
-        jmp menu
+        ;----------------
+        clearScreen
+        getTypeSort
+        getVelocity 
+        isAscDesc
+
+        cmp typeOfSort, 'B'
+        je bubble
+        cmp typeOfSort, 'Q'
+        je quick
+        jmp shell
+
+        bubble:
+            cmp ax, 1 
+            je bubbleAsc
+
+            bubbleDesc:
+
+                jmp menu
+
+            bubbleAsc:
+                bubbleSortAsc arrayTop
+                jmp menu
+
+        quick:
+
+            jmp menu
+
+        shell:
+
+            jmp menu
     topTiempo:
         statistics
         jmp menu
@@ -482,6 +491,71 @@ LOCAL menu, topPuntos, topTiempo, logout
         cleanBuffer userName, SIZEOF username, 24h
         cleanBuffer userPass, SIZEOF userPass, 24h
         jmp menuPrincipal
+
+endm
+
+getTypeSort macro
+LOCAL menu, bubble, quick, shell, finish
+    menu:
+        print sortMenu
+        getChar
+        cmp al, '1'
+        je bubble
+        cmp al, '2'
+        je quick
+        cmp al, '3'
+        je shell
+        jmp menu
+
+    bubble:
+        mov typeOfSort, 'B'
+        jmp finish
+    
+    quick:
+        mov typeOfSort, 'Q'
+        jmp finish
+    
+    shell:
+        mov typeOfSort, 'S'
+    
+    finish:
+
+endm
+
+getVelocity macro
+    xor ax, ax
+    xor bx, bx
+    print velMsg
+    getChar
+    mov bl, al
+    sub bl, 48
+    xor ax, ax
+    mov ax, 200
+    mul bx
+    mov velocity, ax
+endm
+
+;return ax 1 = asc | 0 = desc
+isAscDesc macro
+LOCAL menu, ascendent, descendet, finish
+    
+    menu:
+        print typeMsg
+        getChar 
+        cmp al, '1'
+        je ascendent
+        cmp al, '2'
+        je descendent
+        jmp menu
+
+    ascendent:
+        mov ax, 1
+        jmp finish
+
+    descendent:
+        mov ax, 0
+        
+    finish:
 
 endm
 

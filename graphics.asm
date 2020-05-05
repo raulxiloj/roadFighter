@@ -322,8 +322,7 @@ statistics macro
     setVideoMode 
     paintBoard 0fh
     drawBars
-    ;drawBar 16050, 20, 7   ;(50,50)
-    Delay 2000
+    Delay velocity
     setTextMode
 endm
 
@@ -366,7 +365,7 @@ LOCAL while, finish
     xor cx, cx
     mov si, 2
     mov varX, 20
-    int 3
+    
     while:
         cmp cl, nElements
         je finish

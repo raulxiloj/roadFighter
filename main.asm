@@ -14,6 +14,9 @@ header2     db "UNIVERSIDAD DE SAN CARLOS DE GUATEMALA",10,"FACULTAD DE INGENIER
 mainMenu    db 10,9,9,9,"     1. Ingresar",10,9,9,9,"     2. Registrar",10,9,9,9,"     3. Salir",10,10,9,9,9,"Ingrese una opcion: ",'$'
 userMenu    db 10,"1. Iniciar juego",10,"2. Cargar juego",10,"3. Logout",10,10,"Ingrese una opcion: ",'$'
 adminMenu   db 10,"1. Top 10 puntos",10,"2. Top 10 tiempo",10,"3. Logout",10,10,"Ingrese una opcion: ",'$'
+sortMenu    db 10,"1. Ordenamiento BubbleSort",10,"2. Ordenamiento QuickSort",10,"3. Ordenamiento ShellSort",10,10,"Ingrese una opcion: ",'$'
+velMsg      db 10,10,"INGRESE UNA VELOCIDAD (0-9): ",'$'
+typeMsg     db 10,10,"1. Ascendente",10,"2. Descendente",10,10,"Ingrese una opcion: ",'$'
 comma       db ","
 newLine     db 10,'$'
 ;------------------------------Game vars---------------------------------------
@@ -48,6 +51,8 @@ top1File    db "c:\pro\top1.txt",0  ;top players
 top2File    db "c:\pro\top2.txt",0  ;top time
 auxd        db 5 dup ('$')
 ;------sorting------
+velocity    dw 0
+typeOfSort  db 0
 ;Bubblesort
 nElements   db 0
 vari        db 0
