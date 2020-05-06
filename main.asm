@@ -45,6 +45,10 @@ numLevels   db 0
 currLevel   db 0
 dataLevels  db 42 dup (0)
 ;--------------------------------TOP 10--------------------------------------
+dashes      db "===============================================================================",'$'
+topTitle    db 9,9,9,9,9,"Top 10 pts",10,'$'
+space       db 9,9,'$'
+auxName     db 10 dup('$')
 arrayTop    db 300 dup ('$')
 auxTop      db 5 dup ('$')
 top1File    db "c:\pro\top1.txt",0  ;top players

@@ -487,13 +487,15 @@ LOCAL menu, topPuntos, topTiempo, logout, bubble, quick, shell, bubbleAsc, bubbl
 
             bubbleDesc:
                 bubbleSortDesc arrayTop
-                ;show console report
+                printReport arrayTop
+                getChar
                 ;create file rep
                 jmp menu
 
             bubbleAsc:
                 bubbleSortAsc arrayTop
-                ;show console report
+                printReport arrayTop
+                getChar
                 ;create file rep
                 jmp menu
 
@@ -581,6 +583,106 @@ LOCAL menu, ascendent, descendet, finish
 endm
 
 printReport macro array
+LOCAL for, finish
+    xor cx, cx
+    xor si, si
+    print dashes
+    print topTitle
+    for: 
+        cmp cx, 8
+        je finish
+
+        push cx
+        push si 
+        getName array[si]
+        pop si
+        pop cx
+        print newLine
+        add cx, 49
+        
+        print space
+        printChar cl 
+        printChar 46
+        printChar 32
+        print auxName
+        print space
+        mov bl, arrayTop[si+1]
+        add bl, 48
+        printChar bl
+        print space
+        
+        pusha 
+        cleanBuffer auxd, SIZEOF auxd, 24h
+        popa
+
+        pusha
+        xor dx, dx
+        mov dl, arrayTop[si+2]
+        convertAscii dx, auxd
+        print auxd 
+        popa
+
+        sub cx, 49
+        pusha
+        cleanBuffer auxName, SIZEOF auxName, 24h
+        popa
+
+        add si, 3
+        inc cx  
+        jmp for
+    
+    finish:
+        print newLine
+        print newLine
+        print dashes
+endm
+
+getName macro val
+LOCAL while, copyName, incrementCX, copyName, finish, auxCopy
+    xor bx, bx
+    xor cx, cx
+    xor dx, dx
+
+    openFile top1File, handler
+    readFile handler, fileData, SIZEOF fileData
+    closeFile handler
+
+    xor bx, bx
+    xor cx, cx
+    xor dx, dx
+    
+    while:
+        cmp val, cl 
+        je copyName 
+
+        mov dl, fileData[bx]
+
+        cmp dl, 10
+        je incrementCX
+
+        inc bx
+        jmp while
+
+
+        incrementCX:
+            inc cx
+            inc bx
+            jmp while
+
+        copyName:
+            xor si, si
+            auxCopy:
+                mov dl, fileData[bx]
+                
+                cmp dl, ','
+                je finish
+
+                mov auxName[si], dl
+                inc si 
+                inc bx
+                jmp auxCopy
+
+        finish:
 
 endm
 
