@@ -304,7 +304,7 @@ drawString macro row, col, string
 LOCAL while
     xor bx, bx
     xor cx, cx
-    mov cl, col
+    mov cx, col
     getLength string 
     while:
         push bx
@@ -319,14 +319,32 @@ endm
 
 ;--------------------------------BAR GRAPH------------------------------------
 statistics macro
+LOCAL continue, titleB, titleQ, titleS 
     setVideoMode 
-    paintBoard 0fh
-    drawBars
-    Delay velocity
-    setTextMode
+    ;Title
+    cmp typeOfSort, 'B'
+    je titleB
+    cmp typeOfSort, 'Q'
+    je titleQ
+    jmp titleS
+
+    titleB:
+        drawString 1,1, bubbleTitle
+        jmp continue
+    titleQ:
+        jmp continue
+    titleS:
+
+    continue:
+        drawString 1, 27, velTitle 
+        drawChar 1, 38, velChoosed
+        paintBoard 0fh
+        drawBars
+        Delay velocity
+        setTextMode
 endm
 
-drawBar macro pos, width, color
+drawBar macro pos, width, color, col, numS
 LOCAL for, for2
 ;bottom limit (189,320) = 60800     
     xor ax, ax
@@ -353,9 +371,19 @@ LOCAL for, for2
             inc di
             cmp di, bx
             jne for2
-            cmp di, 54720 
+            cmp di, 54720   ;(170,320)
             jb for
-        
+    
+    ;draw the string number (1754, x)
+    ;drawString 176, 10, numS
+    
+    xor ax, ax
+    xor bx, bx
+    mov ax, 34
+    mul col
+    mov bx, 100
+    div bx
+    drawString 22, ax, nums       ;user  
 endm
 
 ;Draw bars array
@@ -374,8 +402,16 @@ LOCAL while, finish
         getPosition auxBar, varX  
         mov auxBar2, ax
         getColor arrayTop[si]
+        ;------
+        xor dx, dx
+        mov dl, arrayTop[si]
+        pusha
+        cleanBuffer auxd, sizeof auxd, 24h
+        convertAscii dx, auxd
+        popa
+        ;-------
         pusha 
-        drawBar auxBar2, widthBar, colorBar
+        drawBar auxBar2, widthBar, colorBar, varX, auxd
         popa
         add si, 3
         inc cx

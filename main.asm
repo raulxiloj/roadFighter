@@ -51,6 +51,11 @@ top1File    db "c:\pro\top1.txt",0  ;top players
 top2File    db "c:\pro\top2.txt",0  ;top time
 auxd        db 5 dup ('$')
 ;------sorting------
+bubbleTitle db "Ordenamiento: BubbleSort",'$'
+quickTitle  db "Ordenamiento: QuickSort",'$'
+ShellTitle  db "Ordenamiento: ShellSort",'$'
+velTitle    db "Velocidad: ",'$'
+velChoosed  db 0
 velocity    dw 0
 typeOfSort  db 0
 ;Bubblesort

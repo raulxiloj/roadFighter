@@ -186,6 +186,22 @@ LOCAL D1,D2,Fin
         pop si
 endm
 
+;-----------------SOUND-------------------------
+Sound macro hz
+    mov al, 86h
+    out 43h, al
+    mov ax, (1193180/hz)
+    out 42h, al
+    mov al, ah
+    out 42h, al
+    in al, 61h
+    or al, 00000011b
+    out 61h, al
+    delay 500
+    in al, 61h
+    and al, 11111100b
+    out 61h, al
+endm
 ;-----------------------------------------------------------------------------
 ;-------------------------------REGISTER--------------------------------------
 ;-----------------------------------------------------------------------------
@@ -470,11 +486,15 @@ LOCAL menu, topPuntos, topTiempo, logout, bubble, quick, shell, bubbleAsc, bubbl
             je bubbleAsc
 
             bubbleDesc:
-
+                bubbleSortDesc arrayTop
+                ;show console report
+                ;create file rep
                 jmp menu
 
             bubbleAsc:
                 bubbleSortAsc arrayTop
+                ;show console report
+                ;create file rep
                 jmp menu
 
         quick:
@@ -527,6 +547,7 @@ getVelocity macro
     xor bx, bx
     print velMsg
     getChar
+    mov velChoosed, al
     mov bl, al
     sub bl, 48
     xor ax, ax
@@ -556,6 +577,10 @@ LOCAL menu, ascendent, descendet, finish
         mov ax, 0
         
     finish:
+
+endm
+
+printReport macro array
 
 endm
 
