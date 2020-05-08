@@ -80,7 +80,7 @@ endm
 
 ;macro para seguir escribiendo en una de terminada posicion del fichero 
 seekEnd macro handler
-    mov ah,42h
+    mov ah, 42h
     mov al, 02h
     mov bx, handler
     mov cx, 0
@@ -456,4 +456,88 @@ LOCAL while, finish
         jmp while
 
     finish:
+endm
+
+;---------------------------------------------------------------
+;-------------------------REPORT--------------------------------
+;---------------------------------------------------------------
+createReport macro array
+LOCAL while, finish, printSpaces, finishSpaces
+
+    createFile repFile, handler2
+    writeFile handler2, dashes, SIZEOF dashes2
+    writeFile handler2, newLine, 1
+    writeFile handler2, topTitle, [SIZEOF topTitle - 1]
+    writeFile handler2, newLine, 1
+
+    xor cx, cx
+    xor si, si
+
+    while:
+        cmp cl, nElements
+        je finish
+        
+        push cx
+        push si
+        getName array[si]
+        pop si
+        pop cx
+
+        add cx, 49
+        mov auxCont, cl
+        pusha
+        writeFile handler2, newLine, 1
+        writeFile handler2, space, [SIZEOF space - 1]
+        writeFile handler2, auxCont, 1
+        writeFile handler2, period, 1 
+        writeFile handler2, space1, 1
+        getLength auxName
+        writeFile handler2, auxName, si
+        popa
+        
+        mov auxCont, 32
+
+        pusha
+        getLength auxName
+        cmp si, 7 
+        je finishSpaces  
+
+        printSpaces:
+            writeFile handler2, auxCont, 1
+            inc si
+            cmp si, 7
+            jne printSpaces
+        finishSpaces:
+            popa
+
+        pusha 
+        writeFile handler2, space, [SIZEOF space - 1]
+        mov bl, array[si+1]
+        add bl, 48
+        mov auxCont, bl
+        writeFile handler2, auxCont, 1
+        writeFile handler2, space, [SIZEOF space - 1]
+        xor dx, dx
+        mov dl, array[si+2]
+        convertAscii dx, auxd
+        getLength auxd
+        writeFile handler2, auxd, si 
+        popa
+
+        sub cx, 49
+
+        pusha 
+        cleanBuffer auxName, SIZEOF auxName, 24h
+        cleanBuffer auxd, SIZEOF auxd, 24h
+        popa
+
+        add si, 3
+        inc cx
+        jmp while
+
+    finish:
+        writeFile handler2, newLine, 1
+        writeFile handler2, newLine, 1
+        writeFile handler2, dashes, SIZEOF dashes2
+        closeFile handler2
 endm
