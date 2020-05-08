@@ -46,6 +46,7 @@ currLevel   db 0
 dataLevels  db 42 dup (0)
 ;--------------------------------TOP 10--------------------------------------
 dashes      db "===============================================================================",'$'
+dashes2     db "==================================================="
 topTitle    db 9,9,9,9,9,"Top 10 pts",10,'$'
 space       db 9,9,'$'
 auxName     db 10 dup('$')
@@ -91,12 +92,17 @@ adminPass   db "1234"
 userFile    db "c:\pro\users.txt",0
 ;inputFile   db 50 dup ('$')
 inputFile   db "c:\pro\prueba.txt",0    ;bugs with other extension
+repFile     db "c:\pro\puntos.rep",0
 fileData    db 1000 dup('$')
 fileSize    dw 0
 handler     dw ?
+handler2    dw ? ;for the report when I open two files at the same time
 auxFile     db 10 dup ('$')
 msgFile     db 10,10,"Ingrese la ruta del archivo de entrada: ",'$'    
 userSaved   db 10,"Usuario registrado correctamente ",'$'
+period      db "."
+space1      db 32
+auxCont     db " " 
 ;----------------------------Possibles errors--------------------------------
 error1      db 10,13,"ERROR: Opcion invalida",10,13,'$'
 error2      db 10,13,"ERROR al abrir archivo",10,13,'$'
@@ -107,6 +113,7 @@ error6      db "ERROR: el nombre de usuario no puede exceder los 7 caracteres", 
 error7      db "ERROR: la contrasena tiene que ser 4 digitos",10,'$'
 error8      db "ERROR: ese nombre ya esta registrado, por favor ingrese otro",10,'$'
 error9      db "ERROR: credenciales incorrectas",10,'$'
+error10     db 10,13,"Error al crear el archivo",10,13,'$'
 ;---------------------------------------------------------------------------------------------
 ;-----------------------------------------Code segment-----------------------------------------
 ;----------------------------------------------------------------------------------------------
@@ -154,6 +161,9 @@ main proc
     errorAppending:
         print error5
         getChar
+        jmp menuPrincipal
+    errorCreating:
+        print error10
         jmp menuPrincipal
     exit:
         mov ah, 4ch

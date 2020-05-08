@@ -489,14 +489,14 @@ LOCAL menu, topPuntos, topTiempo, logout, bubble, quick, shell, bubbleAsc, bubbl
                 bubbleSortDesc arrayTop
                 printReport arrayTop
                 getChar
-                ;create file rep
+                createReport arrayTop
                 jmp menu
 
             bubbleAsc:
                 bubbleSortAsc arrayTop
                 printReport arrayTop
                 getChar
-                ;create file rep
+                createReport arrayTop
                 jmp menu
 
         quick:
@@ -583,13 +583,13 @@ LOCAL menu, ascendent, descendet, finish
 endm
 
 printReport macro array
-LOCAL for, finish
+LOCAL for, finish, auxSpaces, finishSpaces, printSpaces
     xor cx, cx
     xor si, si
     print dashes
     print topTitle
     for: 
-        cmp cx, 8
+        cmp cl, nElements
         je finish
 
         push cx
@@ -605,7 +605,22 @@ LOCAL for, finish
         printChar 46
         printChar 32
         print auxName
+        
+        push si 
+        getLength auxName
+        cmp si, 7
+        je finishSpaces
+
+        printSpaces:
+            printChar 32
+            inc si
+            cmp si, 7
+            jne printSpaces
+        finishSpaces:
+            pop si
+        
         print space
+
         mov bl, arrayTop[si+1]
         add bl, 48
         printChar bl
@@ -639,9 +654,6 @@ endm
 
 getName macro val
 LOCAL while, copyName, incrementCX, copyName, finish, auxCopy
-    xor bx, bx
-    xor cx, cx
-    xor dx, dx
 
     openFile top1File, handler
     readFile handler, fileData, SIZEOF fileData
