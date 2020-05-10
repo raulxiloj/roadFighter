@@ -123,25 +123,31 @@ analisis macro
     print newLine
     print fileData
     ;analisis
-    getLevelsData
+    getLevelData currPosF
     getChar
     cleanBuffer fileData, SIZEOF fileData, 24h
 endm
 
-getLevelsData macro
-LOCAL while, continue, finish, state0, state1, state2, state3, state4, state5, state6, state7, finish1, finish2, finish3, finish4, finish5, finish6, finish7
+getLevelData macro pos
+LOCAL while, continue, finish, state1, state2, state3, state4, state5, state6, state7, finish1, finish2, finish3, finish4, finish5, finish6, finish7, c1,c2,c3,c4, auxColor
+    openFile inputFile, handler
+    readFile handler, fileData, SIZEOF fileData
+    closeFile handler
     xor si, si
     xor ax, ax  ;LEVEL|1-num|2-timeLevel|3-timeObst|4-timePrice|5-color|6-ptsPrices|7-ptsObst
     xor bx, bx  ;actual char of aux 
     xor cx, cx  ;actual char of fileData
 
+    mov si, pos
+    add si, 11
+    inc ax
+
     while:
+        int 3
         cmp si, fileSize
         je finish
         
         mov cl, fileData[si]
-        cmp ax, 0
-        je state0
         cmp ax, 1
         je state1
         cmp ax, 2
@@ -156,12 +162,6 @@ LOCAL while, continue, finish, state0, state1, state2, state3, state4, state5, s
         je state6
         cmp ax, 7
         je state7
-        
-        state0: ;'LEVEL'
-            cmp cl, ';'
-            jne continue 
-            inc ax
-            jmp continue
 
         state1: ;num level
             cmp cl, ';'
@@ -172,15 +172,11 @@ LOCAL while, continue, finish, state0, state1, state2, state3, state4, state5, s
             jmp continue
 
             finish1:
-                ;--------------------
-                push ax
-                print newLine
-                print auxFile
-                pop ax
-                ;---------------------
-                xor bx, bx
                 inc ax
                 ;get number
+                mov bl, auxFile[0]
+                mov numLevel, bl
+                xor bx, bx
                 push si
                 cleanBuffer auxFile, SIZEOF auxFile, 24h
                 pop si
@@ -195,14 +191,16 @@ LOCAL while, continue, finish, state0, state1, state2, state3, state4, state5, s
             jmp continue
 
             finish2:
-                ;--------------------
-                push ax
-                print newLine
-                print auxFile
-                pop ax
-                ;---------------------
                 xor bx, bx
                 inc ax
+
+                ;get number
+                pusha
+                convertNumber auxFile
+                mov timeLevel, ax
+                popa
+
+                ;clean auxFile for future values
                 push si
                 cleanBuffer auxFile, SIZEOF auxFile, 24h
                 pop si
@@ -217,14 +215,15 @@ LOCAL while, continue, finish, state0, state1, state2, state3, state4, state5, s
             jmp continue
 
             finish3:
-                ;--------------------
-                push ax
-                print newLine
-                print auxFile
-                pop ax
-                ;---------------------
                 xor bx, bx
                 inc ax
+
+                ;get number
+                pusha
+                convertNumber auxFile
+                mov timeObs, al
+                popa
+            
                 push si
                 cleanBuffer auxFile, SIZEOF auxFile, 24h
                 pop si
@@ -239,20 +238,23 @@ LOCAL while, continue, finish, state0, state1, state2, state3, state4, state5, s
             jmp continue
 
             finish4:
-                ;--------------------
-                push ax
-                print newLine
-                print auxFile
-                pop ax
-                ;---------------------
                 xor bx, bx
                 inc ax
+
+                ;get number
+                pusha
+                convertNumber auxFile
+                mov timeAward, al
+                popa
+
                 push si
                 cleanBuffer auxFile, SIZEOF auxFile, 24h
                 pop si
                 jmp continue
 
-        state5: ;color
+
+
+        state5: ;pts prices
             cmp cl, ';'
             je finish5
 
@@ -261,20 +263,21 @@ LOCAL while, continue, finish, state0, state1, state2, state3, state4, state5, s
             jmp continue
 
             finish5:
-                ;--------------------
-                push ax
-                print newLine
-                print auxFile
-                pop ax
-                ;---------------------
                 xor bx, bx
                 inc ax
+
+                ;getNumber
+                pusha
+                convertNumber auxFile
+                mov ptsAwards, al
+                popa
+
                 push si
                 cleanBuffer auxFile, SIZEOF auxFile, 24h
                 pop si
                 jmp continue
 
-        state6: ;pts prices
+        state6: ;pts obst
             cmp cl, ';'
             je finish6
 
@@ -283,41 +286,55 @@ LOCAL while, continue, finish, state0, state1, state2, state3, state4, state5, s
             jmp continue
 
             finish6:
-                ;--------------------
-                push ax
-                print newLine
-                print auxFile
-                pop ax
-                ;---------------------
                 xor bx, bx
                 inc ax
+
+                ;getNumber
+                pusha
+                convertNumber auxFile
+                mov ptsObs, al
+                popa
+
                 push si
                 cleanBuffer auxFile, SIZEOF auxFile, 24h
                 pop si
                 jmp continue
 
-        state7: ;pts obst
-            cmp cl, 10
-            je finish7
+        state7: ;color
+            cmp cl, 'r'
+            je c1
+            cmp cl, 'v'
+            je c2
+            cmp cl, 'a'
+            je c3 
+            cmp cl, 'b'
+            je c4
 
-            mov auxFile[bx], cl
-            inc bx
-            jmp continue
+            c1:
+                mov carColor, 4
+                jmp auxColor
+            c2:
+                mov carColor, 2
+                jmp auxColor
+            c3:
+                mov carColor, 9
+                jmp auxColor
+            c4:
+                mov carColor, 0Fh
 
+            auxColor:
+                inc si
+                mov cl, fileData[si]
+                cmp cl, 10
+                je finish7
+                jmp auxColor
+            
             finish7:
-                ;--------------------
-                push ax
-                print newLine
-                print auxFile
-                pop ax
-                ;---------------------
-                xor ax, ax
-                xor bx, bx
-                push si
+                inc si 
+                mov currPosF, si
                 cleanBuffer auxFile, SIZEOF auxFile, 24h
-                pop si
-                jmp continue
-
+                jmp finish
+                
         continue:
             inc si
             jmp while
