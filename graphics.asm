@@ -79,10 +79,10 @@ LOCAL for1, for2
 endm
 
 ;-----------------------------------------------------------------------------
-drawCar macro pos 
+drawCar macro pos
 LOCAL body, wheels1, wheels2
     mov di, pos
-    mov dl, 4
+    mov dl, carColor
 
     mov es:[di+3], dl
     mov es:[di+4], dl
@@ -459,4 +459,64 @@ LOCAL red, blue, yellow, green, white, finish
 
     finish:
     
+endm
+
+getMax macro
+LOCAL for, continue, swap
+    xor ax, ax
+    xor si, si
+    mov si, 2
+
+    for:
+        cmp cl, nElements
+        je finish
+
+        mov al, arrayTop[si]
+        cmp ax, numMax
+        jbe continue 
+        
+        ;change value
+        mov numMax, ax
+
+        continue:   
+            add si, 3
+            inc cx
+            jmp for
+    
+    finish:
+
+endm
+
+getSpaceBetween macro
+    xor ax, ax
+    xor bx, bx
+    mov al, 5
+    mul nElements
+    mov spaceBtw, ax
+endm 
+
+getWidthBar macro
+    xor ax, ax
+    mov ax, 280
+    sub ax, spaceBtw
+    div nElements
+    xor ah, ah
+    mov widthBar, ax
+endm
+
+getScale macro val
+    ;cleanBuffer auxd, sizeof auxd, 24h
+    xor ax, ax
+    xor bx, bx
+    mov ax, 140
+    mov bl, val
+    mul bx
+    mov bx, numMax
+    div bx
+    mov bx, 170
+    sub bx, ax
+    mov ax, bx
+    ;convertAscii ax, auxd
+    ;print auxd
+    ;return ax
 endm

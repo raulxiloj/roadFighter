@@ -1,10 +1,7 @@
 initGame macro
     setVideoMode
     ;----------------SETUP----------------
-    drawString 0, 1, userName       ;user
-    drawChar 0, 13, 78              ;level N
-    drawChar 0, 14, 49              ;#
-    drawString 0, 22, pointsAux     ;points
+    setUpGame
     drawString 0, 74, minsAux       ;--time--
     drawString 0, 76, twoPts     
     drawString 0, 77, secsAux       
@@ -12,10 +9,8 @@ initGame macro
     paintBackground 7
     initAwardsBlocks
     initObstaclesBlocks
-    mov timeAward, 5
-    mov timeObs, 10
     mov currPos, 50072
-    drawCar 50072              ;Initial position of the car 
+    drawCar 50072                  ;Initial position of the car 
     runGame
     setTextMode
 endm
@@ -72,25 +67,36 @@ LOCAL while, refresh, moveCar, moveRight, moveLeft, pauseGame, finishGame
         pop bx
         inc timeAux1
         inc timeAux2
+        inc auxTime 
         generateAwards
         generateObstacles
         checkCollision awards, numAwards, 0
+        checkCollision obstacles, numObs, 1
         ;TODO check points to finish
         ;cmp points, 0
         ;jl finishGame
-        ;TODO check time level 
-        ;cmp timeLevel, 
-        ;je fin
+        ;check time level 
+        mov dx, auxTime
+        cmp timeLevel, dx 
+        je nextLevel
         jmp while
 
-    finishGame:
+    nextLevel:
+        mov si, currPosF
+        cmp si, fileSize
+        je finishGame
+        cleanTime 
+        setUpGame
+        jmp while
+
+      finishGame:
         ;save result of game
         cleanTime
         mov numAwards, 0
         mov numObs, 0
         mov timeAux1, 0
         mov timeAux2, 0
-endm
+endm    
 
 ;------------------------Init positions of blocks----------------------------
 initAwardsBlocks macro
@@ -252,14 +258,14 @@ endm
 
 ;--------------------------------COLLISSIONS------------------------------------
 checkCollision macro array, num, type 
-LOCAL for, while, colission, finish, for2, continue, col
+LOCAL for, while, colission, finish, for2, continue, col, sub3
     push bx
     xor bx, bx
     xor si, si
     mov cl, num
     cmp cl, 0 
     jbe finish
-    int 3
+    ;int 3
     for: 
         
         getPosition array[si], array[si + 2]
@@ -270,10 +276,10 @@ LOCAL for, while, colission, finish, for2, continue, col
             ja col
             jmp continue
             col:
-            mov bx, currPos
-            add bx, 20
-            cmp ax, bx
-            jb colission
+                mov bx, currPos
+                add bx, 20
+                cmp ax, bx
+                jb colission
             continue:
         ;    add ax, 5
         ;    add bx, 5
@@ -313,11 +319,14 @@ LOCAL for, while, colission, finish, for2, continue, col
         mov al, type
         cmp al, 0   ;awards
         jne sub3
-
-        add points,3 
+        xor ax, ax
+        mov al, ptsAwards
+        add points, ax
         jmp finish
         sub3:
-            sub points, 3
+            xor ax, ax
+            mov al, ptsObs
+            sub points, ax
     finish:
     pop bx
     updatePoints
@@ -359,12 +368,28 @@ LOCAL mins, secs, finish
 endm
 
 cleanTime macro
+    mov auxTime, 0
     mov minutes,0
     mov seconds,0
     mov minsAux[0], '0'
     mov minsAux[1], '0'
     mov secsAux[0], '0'
     mov secsAux[1], '0'
+endm
+
+resetTime macro
+    mov numAwards, 0
+    mov numObs, 0
+    mov timeAux1, 0
+    mov timeAux2, 0
+endm
+
+setUpGame macro
+    getLevelData currPosF
+    drawString 0, 1, userName       ;user
+    drawChar 0, 13, 78              ;level N
+    drawChar 0, 14, numLevel        ;#
+    drawString 0, 22, pointsAux     ;points
 endm
 
 updatePoints macro
