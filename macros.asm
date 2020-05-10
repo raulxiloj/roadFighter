@@ -501,6 +501,8 @@ LOCAL menu, topPuntos, topTiempo, logout, bubble, quick, shell, bubbleAsc, bubbl
 
         quick:
 
+            quickSort arrayTop
+
             jmp menu
 
         shell:
@@ -721,7 +723,7 @@ LOCAL menu, startGame, logout
     chargeGame:
         print msgFile
         ;getPath inputFile
-        analisis
+        ;analisis
         jmp menu
     logout:
         cleanBuffer userName, SIZEOF username, 24h

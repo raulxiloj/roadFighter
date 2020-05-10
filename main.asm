@@ -31,7 +31,12 @@ timeAward   db 0                ;how often appear
 timeObs     db 0            
 timeAux1    db 0             
 timeAux2    db 0
-timeLevel   dw 0              
+ptsAwards   db 0
+ptsObs      db 0
+timeLevel   dw 0
+auxTime     dw 0     
+numLevel    db 0      
+carColor    db 0   
 ;-------Time game-------
 minutes     dw 0
 seconds     dw 0
@@ -40,10 +45,6 @@ twoPts      db ":",'$'
 secsAux     db "00",'$'
 ;-----------------------
 auxBlock    dw 4 dup (0)
-;------Levels data------
-numLevels   db 0
-currLevel   db 0
-dataLevels  db 42 dup (0)
 ;--------------------------------TOP 10--------------------------------------
 dashes      db "===============================================================================",'$'
 dashes2     db "==================================================="
@@ -63,13 +64,12 @@ velTitle    db "Velocidad: ",'$'
 velChoosed  db 0
 velocity    dw 0
 typeOfSort  db 0
-;Bubblesort
-nElements   db 0
-vari        db 0
-varj        db 0
+;Vars to make a swap
 auxSort     db 0
 auxSort2    db 0
 auxSort3    db 0
+;Bar graphics
+nElements   db 0
 numMax      dw 0
 spaceBtw    dw 0
 widthBar    dw 0
@@ -77,6 +77,13 @@ auxBar      dw 0
 varX        dw 0
 auxBar2     dw 0
 colorBar    db 1
+;quickSort
+tamMin      dw 0
+tamMax      dw 0
+valActual   dw 0
+leftP       db 0
+rightP      db 0
+pivot       dw 0
 ;------------------------Login & Register variables--------------------------
 msgRegister db "Registro",10,"========",10,10,'$'
 msgLogin    db "Ingresar",10,"========",10,10,'$'
@@ -91,7 +98,7 @@ adminPass   db "1234"
 ;------------------------File messages and variables-------------------------
 userFile    db "c:\pro\users.txt",0
 ;inputFile   db 50 dup ('$')
-inputFile   db "c:\pro\prueba.txt",0    ;bugs with other extension
+inputFile   db "c:\pro\entrada.ply",0    ;bugs with other extension
 repFile     db "c:\pro\puntos.rep",0
 fileData    db 1000 dup('$')
 fileSize    dw 0
@@ -103,6 +110,7 @@ userSaved   db 10,"Usuario registrado correctamente ",'$'
 period      db "."
 space1      db 32
 auxCont     db " " 
+currPosF    dw 0
 ;----------------------------Possibles errors--------------------------------
 error1      db 10,13,"ERROR: Opcion invalida",10,13,'$'
 error2      db 10,13,"ERROR al abrir archivo",10,13,'$'

@@ -1,3 +1,4 @@
+;---------------------BubbleSort algorithm---------------------
 bubbleSortAsc macro array
 LOCAL for, for2, continue, continue2, swap, finish
     xor ax, ax  ;al actual -  ah siguiente
@@ -114,62 +115,85 @@ LOCAL for, for2, continue, continue2, swap, finish
         
 endm
 
-getMax macro
-LOCAL for, continue, swap
-    xor ax, ax
-    xor si, si
-    mov si, 2
+;---------------------QuickSort algorithm---------------------
+quickSort macro array
+LOCAL while,fin,fin0,fin1
+    pusha
+    mov si, sp
+    mov tamMin, 0
+    mov al, nElements
+    sub ax, 1
+    mov tamMax, ax
+    push tamMin
+    push tamMax
+
+    while:
+        cmp sp, si
+        je fin
+        pop tamMax
+        pop tamMin 
+        partitionAsc 
+        mov bx, pivot
+        dec bx
+        cmp bx, tamMin
+        jle fin0
+        push tamMin
+        push bx    
+
+    fin0:
+        mov bx, pivot
+        inc bx
+        cmp bx, tamMax
+        jge fin1
+        push bx 
+        push tamMax
+    fin1:
+        jmp while
+
+    fin:
+        popa
+endm
+
+partitionAsc macro array
+LOCAL for, fin, fin1, swap
+
+    pusha 
+
+    mov di, tamMax
+    mov dl, array[di]
+    mov si, tamMin
+    dec si
+    mov bx, tamMin
 
     for:
-        cmp cl, nElements
-        je finish
+        mov cx, tamMax
+        dec cx
+        cmp bx, cx
+        jg fin
+        mov cl, array[bx]
+        cmp cl, dl
+        jg fin1
+    swap:
+        inc si
+        xor cx, cx
+        mov cl, array[si]
+        mov al, array[bx]
+        mov array[si], al
+        mov array[bx], cl
+        mov valActual, cx
+    fin1:
+        inc bx
+        jmp for
+    fin:
+        mov cl, array[si + 1]
+        mov di, tamMax
+        mov dl, array[di]
+        mov array[si + 1], dl
+        mov array[di], cl
+        xor ch, ch
+        mov valActual, cx
+        inc si
+        mov pivot, si
 
-        mov al, arrayTop[si]
-        cmp ax, numMax
-        jbe continue 
-        
-        ;change value
-        mov numMax, ax
-
-        continue:   
-            add si, 3
-            inc cx
-            jmp for
-    
-    finish:
-
-endm
-
-getSpaceBetween macro
-    xor ax, ax
-    xor bx, bx
-    mov al, 5
-    mul nElements
-    mov spaceBtw, ax
-endm 
-
-getWidthBar macro
-    xor ax, ax
-    mov ax, 280
-    sub ax, spaceBtw
-    div nElements
-    xor ah, ah
-    mov widthBar, ax
-endm
-
-getScale macro val
-    ;cleanBuffer auxd, sizeof auxd, 24h
-    xor ax, ax
-    xor bx, bx
-    mov ax, 140
-    mov bl, val
-    mul bx
-    mov bx, numMax
-    div bx
-    mov bx, 170
-    sub bx, ax
-    mov ax, bx
-    ;convertAscii ax, auxd
-    ;print auxd
-    ;return ax
+        popa
 endm
